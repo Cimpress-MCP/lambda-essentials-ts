@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "lib": ["ESNext"],
+    "target": "es2018",
+    "outDir": "lib",
+    "declaration": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "noImplicitAny": false,
+    "preserveConstEnums": true,
+    "newLine": "lf"
+  },
+  "include": ["src/**/*.ts"]
+}
