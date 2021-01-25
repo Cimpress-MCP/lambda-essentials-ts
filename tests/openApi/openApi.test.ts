@@ -1,5 +1,5 @@
 import { ApiRequest } from '../../src/openApi/apiRequestModel';
-import { OpenApiWrapper } from '../../src/openApi/openApiWrapper';
+import OpenApiWrapper from '../../src/openApi/openApiWrapper';
 import { ForbiddenException, InternalException } from '../../src';
 import { ApiResponse } from '../../src/openApi/apiResponseModel';
 
