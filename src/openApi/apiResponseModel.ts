@@ -1,5 +1,5 @@
 export class ApiResponse<T = any> {
-  private readonly orionCorrelationIdRoot = 'orion-correlation-id-root';
+  private static orionCorrelationIdRoot = 'orion-correlation-id-root';
 
   public readonly body?: T;
 
@@ -14,7 +14,7 @@ export class ApiResponse<T = any> {
   }
 
   public withCorrelationId(correlationId: string) {
-    this.headers[this.orionCorrelationIdRoot] = correlationId;
+    this.headers[ApiResponse.orionCorrelationIdRoot] = correlationId;
     return this;
   }
 }

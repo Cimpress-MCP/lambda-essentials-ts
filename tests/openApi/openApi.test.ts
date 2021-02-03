@@ -56,7 +56,7 @@ describe('Open API Wrapper', () => {
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
       const statusCode = 200;
-      const response: ApiResponse = {
+      const response: Partial<ApiResponse> = {
         statusCode,
       };
 
@@ -76,7 +76,7 @@ describe('Open API Wrapper', () => {
     const error = new Error(message);
 
     test('returns 500 and logs CRITICAL when unexpected error is caught', async () => {
-      const expected: ApiResponse = {
+      const expected: Partial<ApiResponse> = {
         body: {
           details: {
             message,
@@ -85,6 +85,9 @@ describe('Open API Wrapper', () => {
           title: 'Unexpected error',
         },
         statusCode: 500,
+        headers: {
+          'orion-correlation-id-root': 'not-set',
+        },
       };
 
       const logger = new LoggerMock();
@@ -102,12 +105,15 @@ describe('Open API Wrapper', () => {
 
     test('returns 500 and logs ERROR when internal exception is caught', async () => {
       const exception = new InternalException(error);
-      const expected: ApiResponse = {
+      const expected: Partial<ApiResponse> = {
         body: {
           details: exception.details,
           title: 'Internal Server Error',
         },
         statusCode: 500,
+        headers: {
+          'orion-correlation-id-root': 'not-set',
+        },
       };
 
       const logger = new LoggerMock();
@@ -125,12 +131,15 @@ describe('Open API Wrapper', () => {
 
     test('returns correct status code and logs INFO when other than internal exception is caught', async () => {
       const exception = new ForbiddenException(message);
-      const expected: ApiResponse = {
+      const expected: Partial<ApiResponse> = {
         body: {
           details: exception.details,
           title: 'tests-error-message',
         },
         statusCode: 403,
+        headers: {
+          'orion-correlation-id-root': 'not-set',
+        },
       };
 
       const logger = new LoggerMock();
@@ -144,6 +153,10 @@ describe('Open API Wrapper', () => {
         details: exception.details,
         statusCode: 403,
       });
+    });
+
+    test('returns correlation ID from request headers in resposne headers', async () => {
+      // TBD
     });
   });
 });
