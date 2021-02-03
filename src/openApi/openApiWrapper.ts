@@ -78,7 +78,7 @@ export default class OpenApiWrapper {
               title: error.message,
               details: error.details,
               errorId: requestLogger.invocationId, // TODO: Keep?
-            });
+            }).withCorrelationId(this.correlationId);
           }
 
           const serializedError = serializeObject(error);
