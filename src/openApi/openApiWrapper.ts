@@ -9,6 +9,8 @@ import { serializeObject } from '../util';
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
 
+  private readonly cleared = 'cleared';
+
   private readonly canonicalIdKey = 'https://claims.cimpress.io/canonical_id';
 
   private readonly orionCorrelationIdRoot = 'orion-correlation-id-root';
@@ -55,40 +57,42 @@ export default class OpenApiWrapper {
             statusCode: response.statusCode,
           });
 
+          const { correlationId } = this;
           this.clearContext();
 
           if (response instanceof ApiResponse) {
-            return response.withCorrelationId(this.correlationId);
+            return response.withCorrelationId(correlationId);
           }
 
           return response;
         },
 
         errorMiddleware: (request: ApiRequest<unknown>, error: Exception | Error): ApiResponse => {
+          const { correlationId } = this;
           this.clearContext();
+          const serializedError = serializeObject(error);
 
           if (error instanceof Exception) {
             if (error.statusCode === 500) {
-              requestLogger.log({ title: 'ErrorLogger', level: 'ERROR', ...error });
+              requestLogger.log({ title: 'ErrorLogger', level: 'ERROR', ...serializedError });
             } else {
-              requestLogger.log({ title: 'ErrorLogger', level: 'INFO', ...error });
+              requestLogger.log({ title: 'ErrorLogger', level: 'INFO', ...serializedError });
             }
 
             return new ApiResponse(error.statusCode, {
               title: error.message,
               details: error.details,
               errorId: requestLogger.invocationId, // TODO: Keep?
-            }).withCorrelationId(this.correlationId);
+            }).withCorrelationId(correlationId);
           }
 
-          const serializedError = serializeObject(error);
           requestLogger.log({ title: 'ErrorLogger', level: 'CRITICAL', ...serializedError });
 
           return new ApiResponse(500, {
             title: 'Unexpected error',
             details: serializedError,
             errorId: requestLogger.invocationId,
-          }).withCorrelationId(this.correlationId);
+          }).withCorrelationId(correlationId);
         },
       },
       () => {},
@@ -118,14 +122,15 @@ export default class OpenApiWrapper {
   }
 
   private clearContext() {
-    this.userToken = this.notSet;
-    this.requestId = this.notSet;
-    this.userPrincipal = this.notSet;
-    this.correlationId = this.notSet;
+    this.userToken = this.cleared;
+    this.requestId = this.cleared;
+    this.userPrincipal = this.cleared;
+    this.correlationId = this.cleared;
   }
 
   private generateCorrelationId(headers: Record<string, string>) {
     const existingCorrelationId = headers[this.orionCorrelationIdRoot];
-    return existingCorrelationId ?? uuid.v4();
+    this.correlationId = existingCorrelationId ?? uuid.v4();
+    return this.correlationId;
   }
 }
