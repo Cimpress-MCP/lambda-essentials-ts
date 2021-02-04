@@ -60,9 +60,9 @@ export default class OpenApiWrapper {
           const { correlationId } = this;
           this.clearContext();
 
-          if (response instanceof ApiResponse) {
-            return response.withCorrelationId(correlationId);
-          }
+          response.headers = Object.assign(response.headers ?? {}, {
+            [this.orionCorrelationIdRoot]: correlationId,
+          });
 
           return response;
         },
