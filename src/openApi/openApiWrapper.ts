@@ -28,7 +28,7 @@ export default class OpenApiWrapper {
   constructor(requestLogger) {
     this.api = new OpenApi(
       {
-        requestMiddleware: (request: ApiRequest<unknown>) => {
+        requestMiddleware: (request: ApiRequest<unknown>): ApiRequest<unknown> => {
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
@@ -60,11 +60,7 @@ export default class OpenApiWrapper {
           const { correlationId } = this;
           this.clearContext();
 
-          response.headers = Object.assign(response.headers ?? {}, {
-            [orionCorrelationIdRoot]: correlationId,
-          });
-
-          return response;
+          return response.withCorrelationId(correlationId);
         },
 
         errorMiddleware: (request: ApiRequest<unknown>, error: Exception | Error): ApiResponse => {
