@@ -5,6 +5,7 @@ import { ApiRequest } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 import { serializeObject } from '../util';
+import { orionCorrelationIdRoot } from '../shared';
 
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
@@ -12,8 +13,6 @@ export default class OpenApiWrapper {
   private readonly cleared = 'cleared';
 
   private readonly canonicalIdKey = 'https://claims.cimpress.io/canonical_id';
-
-  private readonly orionCorrelationIdRoot = 'orion-correlation-id-root';
 
   public api: OpenApi;
 
@@ -61,7 +60,7 @@ export default class OpenApiWrapper {
           this.clearContext();
 
           response.headers = Object.assign(response.headers ?? {}, {
-            [this.orionCorrelationIdRoot]: correlationId,
+            [orionCorrelationIdRoot]: correlationId,
           });
 
           return response;
@@ -129,7 +128,7 @@ export default class OpenApiWrapper {
   }
 
   private generateCorrelationId(headers: Record<string, string>) {
-    const existingCorrelationId = headers[this.orionCorrelationIdRoot];
+    const existingCorrelationId = headers[orionCorrelationIdRoot];
     this.correlationId = existingCorrelationId ?? uuid.v4();
     return this.correlationId;
   }

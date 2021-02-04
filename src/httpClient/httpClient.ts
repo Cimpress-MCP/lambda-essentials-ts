@@ -16,12 +16,11 @@ import retryAdapterEnhancer, {
 import { serializeAxiosError } from '../util';
 import { InternalException } from '../exceptions/internalException';
 import { ClientException } from '../exceptions/clientException';
+import { orionCorrelationIdRoot } from '../shared';
 
 const invalidToken: string = 'Invalid token';
 
 export default class HttpClient {
-  private readonly orionCorrelationIdRoot = 'orion-correlation-id-root';
-
   private readonly logFunction: (...msg: any) => void;
 
   private readonly tokenResolverFunction?: () => Promise<string>;
@@ -126,14 +125,14 @@ export default class HttpClient {
         return {
           ...headers,
           Authorization: `Bearer ${token}`,
-          [this.orionCorrelationIdRoot]: correlationId,
+          [orionCorrelationIdRoot]: correlationId,
         };
       }
     }
 
     return {
       ...headers,
-      [this.orionCorrelationIdRoot]: correlationId,
+      [orionCorrelationIdRoot]: correlationId,
     };
   }
 

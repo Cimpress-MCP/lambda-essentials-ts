@@ -1,6 +1,6 @@
-export class ApiResponse<T = any> {
-  private static orionCorrelationIdRoot = 'orion-correlation-id-root';
+import { orionCorrelationIdRoot } from '../shared';
 
+export class ApiResponse<T = any> {
   public readonly body?: T;
 
   public readonly statusCode: number;
@@ -14,7 +14,7 @@ export class ApiResponse<T = any> {
   }
 
   public withCorrelationId(correlationId: string) {
-    this.headers[ApiResponse.orionCorrelationIdRoot] = correlationId;
+    this.headers[orionCorrelationIdRoot] = correlationId;
     return this;
   }
 }
