@@ -6,6 +6,7 @@ import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 import { serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
+import { OpenApiModel } from './openApiModel';
 
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
@@ -14,7 +15,7 @@ export default class OpenApiWrapper {
 
   private readonly canonicalIdKey = 'https://claims.cimpress.io/canonical_id';
 
-  public api: OpenApi;
+  public api: OpenApiModel;
 
   private userToken: string = this.notSet;
 
