@@ -78,7 +78,7 @@ export default class OpenApiWrapper {
             return new ApiResponse(error.statusCode, {
               title: error.message,
               details: error.details,
-              errorId: requestLogger.invocationId, // TODO: Keep?
+              errorId: requestLogger.invocationId,
             }).withCorrelationId(correlationId);
           }
 
