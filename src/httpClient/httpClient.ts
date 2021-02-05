@@ -1,4 +1,5 @@
 import { URL } from 'url';
+import * as uuid from 'uuid';
 import axios, {
   AxiosAdapter,
   AxiosError,
@@ -15,6 +16,7 @@ import retryAdapterEnhancer, {
 import { serializeAxiosError } from '../util';
 import { InternalException } from '../exceptions/internalException';
 import { ClientException } from '../exceptions/clientException';
+import { orionCorrelationIdRoot } from '../shared';
 
 const invalidToken: string = 'Invalid token';
 
@@ -22,6 +24,8 @@ export default class HttpClient {
   private readonly logFunction: (...msg: any) => void;
 
   private readonly tokenResolverFunction?: () => Promise<string>;
+
+  private readonly correlationIdResolverFunction: () => string;
 
   private readonly client: AxiosInstance;
 
@@ -36,6 +40,7 @@ export default class HttpClient {
     // eslint-disable-next-line no-console
     this.logFunction = options?.logFunction ?? console.log;
     this.tokenResolverFunction = options?.tokenResolver;
+    this.correlationIdResolverFunction = options?.correlationIdResolver ?? (() => uuid.v4());
     this.enableCache = options?.enableCache ?? false;
     this.enableRetry = options?.enableRetry ?? false;
     this.client =
@@ -108,6 +113,8 @@ export default class HttpClient {
   async createHeadersWithResolvedToken(
     headers: Record<string, string> = {},
   ): Promise<Record<string, string>> {
+    const correlationId = this.correlationIdResolverFunction();
+
     if (this.tokenResolverFunction) {
       if (headers.Authorization) {
         throw new InternalException(
@@ -118,11 +125,15 @@ export default class HttpClient {
         return {
           ...headers,
           Authorization: `Bearer ${token}`,
+          [orionCorrelationIdRoot]: correlationId,
         };
       }
     }
 
-    return headers;
+    return {
+      ...headers,
+      [orionCorrelationIdRoot]: correlationId,
+    };
   }
 
   /**
@@ -213,6 +224,10 @@ export interface HttpClientOptions {
    * Logger function
    */
   logFunction?: (...msg) => void;
+  /**
+   * A function that returns a correlation ID
+   */
+  correlationIdResolver?: () => string;
   /**
    * enable caching (false by default)
    */

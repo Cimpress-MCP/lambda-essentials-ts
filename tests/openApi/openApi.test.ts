@@ -11,6 +11,7 @@ describe('Open API Wrapper', () => {
   const path = '/path';
   const principalId = 'tests-principal-id';
   const canonicalId = 'tests-canonical-id';
+  const correlationId = 'test-correlation-id';
   const request: ApiRequest<any> = {
     headers,
     httpMethod,
@@ -23,6 +24,13 @@ describe('Open API Wrapper', () => {
         principalId,
       },
       requestId: 'tests-request-id',
+    },
+  };
+  const requestWithCorrelationHeader: ApiRequest<any> = {
+    ...request,
+    headers: {
+      ...request.headers,
+      'orion-correlation-id-root': correlationId,
     },
   };
 
@@ -56,7 +64,7 @@ describe('Open API Wrapper', () => {
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
       const statusCode = 200;
-      const response: ApiResponse = {
+      const response: Partial<ApiResponse> = {
         statusCode,
       };
 
@@ -76,7 +84,7 @@ describe('Open API Wrapper', () => {
     const error = new Error(message);
 
     test('returns 500 and logs CRITICAL when unexpected error is caught', async () => {
-      const expected: ApiResponse = {
+      const expected: Partial<ApiResponse> = {
         body: {
           details: {
             message,
@@ -85,6 +93,9 @@ describe('Open API Wrapper', () => {
           title: 'Unexpected error',
         },
         statusCode: 500,
+        headers: {
+          'orion-correlation-id-root': 'not-set',
+        },
       };
 
       const logger = new LoggerMock();
@@ -102,12 +113,15 @@ describe('Open API Wrapper', () => {
 
     test('returns 500 and logs ERROR when internal exception is caught', async () => {
       const exception = new InternalException(error);
-      const expected: ApiResponse = {
+      const expected: Partial<ApiResponse> = {
         body: {
           details: exception.details,
           title: 'Internal Server Error',
         },
         statusCode: 500,
+        headers: {
+          'orion-correlation-id-root': 'not-set',
+        },
       };
 
       const logger = new LoggerMock();
@@ -125,12 +139,15 @@ describe('Open API Wrapper', () => {
 
     test('returns correct status code and logs INFO when other than internal exception is caught', async () => {
       const exception = new ForbiddenException(message);
-      const expected: ApiResponse = {
+      const expected: Partial<ApiResponse> = {
         body: {
           details: exception.details,
           title: 'tests-error-message',
         },
         statusCode: 403,
+        headers: {
+          'orion-correlation-id-root': 'not-set',
+        },
       };
 
       const logger = new LoggerMock();
@@ -143,6 +160,47 @@ describe('Open API Wrapper', () => {
         title: 'ErrorLogger',
         details: exception.details,
         statusCode: 403,
+      });
+    });
+
+    test('returns correlation ID from request headers in successful response headers', async () => {
+      const logger = new LoggerMock();
+      const openApi = new OpenApiWrapper(logger);
+      const statusCode = 200;
+      const response: ApiResponse = new ApiResponse(statusCode, null);
+
+      const { api } = openApi;
+      api.requestMiddleware(requestWithCorrelationHeader);
+      const actual = api.responseMiddleware(requestWithCorrelationHeader, response);
+
+      expect(actual).toEqual(response.withCorrelationId(correlationId));
+      expect(logger.log).toBeCalledWith({
+        level: 'INFO',
+        title: 'ResponseLogger',
+        statusCode,
+      });
+    });
+
+    test('returns correlation ID from request headers in error response headers', async () => {
+      const statusCode = 500;
+      const expectedResponse: ApiResponse = new ApiResponse(statusCode, {
+        title: 'Internal Server Error',
+      });
+      const internalException = new InternalException();
+      const logger = new LoggerMock();
+      const openApi = new OpenApiWrapper(logger);
+
+      const { api } = openApi;
+      api.requestMiddleware(requestWithCorrelationHeader);
+      const actual = api.errorMiddleware(requestWithCorrelationHeader, internalException);
+
+      expect(actual).toEqual(expectedResponse.withCorrelationId(correlationId));
+      expect(logger.log).toBeCalledWith({
+        level: 'ERROR',
+        title: 'ErrorLogger',
+        statusCode,
+        message: 'Internal Server Error',
+        stack: expect.any(String),
       });
     });
   });
