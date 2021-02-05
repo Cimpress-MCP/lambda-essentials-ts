@@ -64,9 +64,7 @@ describe('Open API Wrapper', () => {
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
       const statusCode = 200;
-      const response: Partial<ApiResponse> = {
-        statusCode,
-      };
+      const response = new ApiResponse(statusCode, null);
 
       const actual = openApi.api.responseMiddleware(request, response);
 
@@ -134,6 +132,8 @@ describe('Open API Wrapper', () => {
         title: 'ErrorLogger',
         details: exception.details,
         statusCode: 500,
+        message: 'Internal Server Error',
+        stack: expect.any(String),
       });
     });
 
@@ -160,6 +160,8 @@ describe('Open API Wrapper', () => {
         title: 'ErrorLogger',
         details: exception.details,
         statusCode: 403,
+        message: 'tests-error-message',
+        stack: expect.any(String),
       });
     });
 
