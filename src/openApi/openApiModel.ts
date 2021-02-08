@@ -1,16 +1,17 @@
-import { ApiRequest } from './apiRequestModel';
+import { ApiRequest, GetRequest, PatchRequest, PostRequest, PutRequest } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 
 export interface OpenApiModel {
-  get: ApiControllerRoute;
-  post: ApiControllerRoute;
-  put: ApiControllerRoute;
-  patch: ApiControllerRoute;
-  delete: ApiControllerRoute;
-  head: ApiControllerRoute;
-  options: ApiControllerRoute;
-  any: ApiControllerRoute;
+  get<T>(path: string, handler: (request: GetRequest<T>) => ApiResponse): void;
+  post<T>(path: string, handler: (request: PostRequest<T>) => ApiResponse): void;
+  put<T>(path: string, handler: (request: PutRequest<T>) => ApiResponse): void;
+  patch<T>(path: string, handler: (request: PatchRequest<T>) => ApiResponse): void;
+  delete<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
+
+  head<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
+  options<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
+  any<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
 
   setAuthorizer(authorizerFunc: (req?: any) => Promise<any>): void;
   onEvent(onEventFunc: (req?: any) => Promise<any>): void;
@@ -30,11 +31,6 @@ export interface OpenApiModel {
     overrideLogger?: () => void,
   );
 }
-
-export type ApiControllerRoute = (
-  path: string,
-  handler: (request?: ApiRequest<any>) => ApiResponse,
-) => void;
 
 export type RequestMiddleware = (request: ApiRequest<any>) => ApiRequest<any>;
 export type ResponseMiddleware = (request: ApiRequest<any>, response: ApiResponse) => ApiResponse;
