@@ -1,12 +1,13 @@
-import { ApiRequest } from './apiRequestModel';
+import { ApiRequest, GetRequest, PatchRequest, PostRequest, PutRequest } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 
 export interface OpenApiModel {
-  get: ApiControllerRoute;
-  post: ApiControllerRoute;
-  put: ApiControllerRoute;
-  patch: ApiControllerRoute;
+  get: ApiControllerRoute<GetRequest>;
+  post: ApiControllerRoute<PostRequest>;
+  put: ApiControllerRoute<PutRequest>;
+  patch: ApiControllerRoute<PatchRequest>;
+
   delete: ApiControllerRoute;
   head: ApiControllerRoute;
   options: ApiControllerRoute;
@@ -31,14 +32,11 @@ export interface OpenApiModel {
   );
 }
 
-export type ApiControllerRoute = (
+export type ApiControllerRoute<T = ApiRequest> = (
   path: string,
-  handler: (request?: ApiRequest<any>) => ApiResponse,
+  handler: (request: T) => Promise<ApiResponse>,
 ) => void;
 
-export type RequestMiddleware = (request: ApiRequest<any>) => ApiRequest<any>;
-export type ResponseMiddleware = (request: ApiRequest<any>, response: ApiResponse) => ApiResponse;
-export type ErrorMiddleware = (
-  request: ApiRequest<unknown>,
-  error: Exception | Error,
-) => ApiResponse;
+export type RequestMiddleware = (request: ApiRequest) => ApiRequest;
+export type ResponseMiddleware = (request: ApiRequest, response: ApiResponse) => ApiResponse;
+export type ErrorMiddleware = (request: ApiRequest, error: Exception | Error) => ApiResponse;
