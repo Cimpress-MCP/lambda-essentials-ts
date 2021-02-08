@@ -3,15 +3,15 @@ import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 
 export interface OpenApiModel {
-  get<T>(path: string, handler: (request: GetRequest<T>) => ApiResponse): void;
-  post<T>(path: string, handler: (request: PostRequest<T>) => ApiResponse): void;
-  put<T>(path: string, handler: (request: PutRequest<T>) => ApiResponse): void;
-  patch<T>(path: string, handler: (request: PatchRequest<T>) => ApiResponse): void;
-  delete<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
+  get: ApiControllerRoute<GetRequest>;
+  post: ApiControllerRoute<PostRequest>;
+  put: ApiControllerRoute<PutRequest>;
+  patch: ApiControllerRoute<PatchRequest>;
 
-  head<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
-  options<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
-  any<T>(path: string, handler: (request: ApiRequest<T>) => ApiResponse): void;
+  delete: ApiControllerRoute;
+  head: ApiControllerRoute;
+  options: ApiControllerRoute;
+  any: ApiControllerRoute;
 
   setAuthorizer(authorizerFunc: (req?: any) => Promise<any>): void;
   onEvent(onEventFunc: (req?: any) => Promise<any>): void;
@@ -32,9 +32,11 @@ export interface OpenApiModel {
   );
 }
 
-export type RequestMiddleware = (request: ApiRequest<any>) => ApiRequest<any>;
-export type ResponseMiddleware = (request: ApiRequest<any>, response: ApiResponse) => ApiResponse;
-export type ErrorMiddleware = (
-  request: ApiRequest<unknown>,
-  error: Exception | Error,
-) => ApiResponse;
+export type ApiControllerRoute<T = ApiRequest> = (
+  path: string,
+  handler: (request: T) => Promise<ApiResponse>,
+) => void;
+
+export type RequestMiddleware = (request: ApiRequest) => ApiRequest;
+export type ResponseMiddleware = (request: ApiRequest, response: ApiResponse) => ApiResponse;
+export type ErrorMiddleware = (request: ApiRequest, error: Exception | Error) => ApiResponse;

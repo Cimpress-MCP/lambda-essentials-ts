@@ -28,7 +28,7 @@ export default class OpenApiWrapper {
   constructor(requestLogger) {
     this.api = new OpenApi(
       {
-        requestMiddleware: (request: ApiRequest<unknown>): ApiRequest<unknown> => {
+        requestMiddleware: (request: ApiRequest): ApiRequest => {
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
@@ -50,7 +50,7 @@ export default class OpenApiWrapper {
           });
           return request;
         },
-        responseMiddleware: (request: ApiRequest<unknown>, response: ApiResponse): ApiResponse => {
+        responseMiddleware: (request: ApiRequest, response: ApiResponse): ApiResponse => {
           requestLogger.log({
             title: 'ResponseLogger',
             level: 'INFO',
@@ -63,7 +63,7 @@ export default class OpenApiWrapper {
           return response.withCorrelationId(correlationId);
         },
 
-        errorMiddleware: (request: ApiRequest<unknown>, error: Exception | Error): ApiResponse => {
+        errorMiddleware: (request: ApiRequest, error: Exception | Error): ApiResponse => {
           const { correlationId } = this;
           this.clearContext();
           const serializedError = serializeObject(error);

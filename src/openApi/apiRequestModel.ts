@@ -1,5 +1,5 @@
-export interface ApiRequest<T> {
-  body?: T;
+export interface ApiRequest<Body = void, Query = void> {
+  body?: Body;
   path: string;
   httpMethod: string;
   requestContext: {
@@ -12,21 +12,21 @@ export interface ApiRequest<T> {
   };
   headers: Record<string, string>;
   pathParameters: Record<string, string>;
-  queryStringParameters?: any;
+  queryStringParameters?: Query;
 }
 
-export interface PostRequest<T> extends ApiRequest<T> {
-  body: T;
+export interface PostRequest<Body = void, Query = void> extends ApiRequest<Body, Query> {
+  body: Body;
 }
 
-export interface PutRequest<T> extends ApiRequest<T> {
-  body: T;
+export interface PutRequest<Body = void, Query = void> extends ApiRequest<Body, Query> {
+  body: Body;
 }
 
-export interface PatchRequest<T> extends ApiRequest<T> {
-  body: T;
+export interface PatchRequest<Body = void, Query = void> extends ApiRequest<Body, Query> {
+  body: Body;
 }
 
-export interface GetRequest<T> extends Omit<ApiRequest<T>, 'body'> {
-  queryStringParameters: T;
+export interface GetRequest<Query = void> extends Omit<ApiRequest<void, Query>, 'body'> {
+  queryStringParameters: Query;
 }

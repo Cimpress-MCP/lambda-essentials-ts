@@ -7,7 +7,7 @@ export class ApiResponse<T = any> {
 
   public readonly headers: Record<string, string>;
 
-  constructor(statusCode: number, body: T, headers?: Record<string, string>) {
+  constructor(statusCode: number, body?: T, headers?: Record<string, string>) {
     this.body = body;
     this.statusCode = statusCode;
     this.headers = headers ?? {};
