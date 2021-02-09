@@ -64,6 +64,7 @@ export default class HttpClient {
           level: 'INFO',
           method: config.method,
           url: config.url,
+          correlationId: config.headers[orionCorrelationIdRoot],
         });
 
         if (!config.url) {
