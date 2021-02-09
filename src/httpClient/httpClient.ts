@@ -1,5 +1,4 @@
 import { URL } from 'url';
-import * as uuid from 'uuid';
 import axios, {
   AxiosAdapter,
   AxiosError,
@@ -25,7 +24,7 @@ export default class HttpClient {
 
   private readonly tokenResolverFunction?: () => Promise<string>;
 
-  private readonly correlationIdResolverFunction: () => string;
+  private readonly correlationIdResolverFunction?: () => string;
 
   private readonly client: AxiosInstance;
 
@@ -40,7 +39,7 @@ export default class HttpClient {
     // eslint-disable-next-line no-console
     this.logFunction = options?.logFunction ?? console.log;
     this.tokenResolverFunction = options?.tokenResolver;
-    this.correlationIdResolverFunction = options?.correlationIdResolver ?? (() => uuid.v4());
+    this.correlationIdResolverFunction = options?.correlationIdResolver;
     this.enableCache = options?.enableCache ?? false;
     this.enableRetry = options?.enableRetry ?? false;
     this.client =
@@ -113,7 +112,10 @@ export default class HttpClient {
   async createHeadersWithResolvedToken(
     headers: Record<string, string> = {},
   ): Promise<Record<string, string>> {
-    const correlationId = this.correlationIdResolverFunction();
+    const newHeaders: Record<string, string> = {};
+    if (this.correlationIdResolverFunction) {
+      newHeaders[orionCorrelationIdRoot] = this.correlationIdResolverFunction();
+    }
 
     if (this.tokenResolverFunction) {
       if (headers.Authorization) {
@@ -122,17 +124,13 @@ export default class HttpClient {
         );
       } else {
         const token = await this.tokenResolverFunction();
-        return {
-          ...headers,
-          Authorization: `Bearer ${token}`,
-          [orionCorrelationIdRoot]: correlationId,
-        };
+        newHeaders.Authorization = `Bearer ${token}`;
       }
     }
 
     return {
       ...headers,
-      [orionCorrelationIdRoot]: correlationId,
+      ...newHeaders,
     };
   }
 
