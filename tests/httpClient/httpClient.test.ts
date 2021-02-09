@@ -5,9 +5,8 @@ describe('createHeadersWithResolvedToken()', () => {
   const testToken = 'unit-test-token';
   const testCorrelationId = 'test-correlation-id';
 
-  test('adds a token and correlation ID', async () => {
+  test('adds a token', async () => {
     const expectedHeaders = {
-      'orion-correlation-id-root': expect.any(String),
       Authorization: `Bearer ${testToken}`,
     };
     const tokenResolverFunctionMock = jest.fn().mockResolvedValue(testToken);
@@ -38,9 +37,7 @@ describe('createHeadersWithResolvedToken()', () => {
   });
 
   test("doesn't add auth header if the tokenResolver is not present", async () => {
-    const expectedHeaders = {
-      'orion-correlation-id-root': expect.any(String),
-    };
+    const expectedHeaders = {};
     const httpClient = new HttpClient();
     const headers = {};
 
