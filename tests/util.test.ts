@@ -34,5 +34,22 @@ describe('Util', () => {
       const serializedError = serializeObject(expected);
       expect(serializedError).toEqual(expected);
     });
+
+    test('serializes Axios Error object', () => {
+      const object = {
+        stringProp: 'string-prop-value',
+        error: { isAxiosError: true, response: { data: { details: 'Error' } } },
+        objectProp: {
+          innerProp: 'inner-prop-value',
+          innerObjectProp: {
+            innerObjectPropKey: 'inner-object-prop-value',
+          },
+        },
+      };
+      const expected = { ...object, error: { details: 'Error' } };
+
+      const serializedError = serializeObject(object);
+      expect(serializedError).toEqual(expected);
+    });
   });
 });

@@ -1,14 +1,14 @@
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export function serializeObject(obj: unknown): object {
   if (obj && typeof obj === 'object') {
     return Object.getOwnPropertyNames(obj).reduce((map, key) => {
+      const propertyValue = obj[key];
       // eslint-disable-next-line no-param-reassign
-      map[key] = obj[key];
+      map[key] = axios.isAxiosError(propertyValue) ? propertyValue?.response?.data : propertyValue;
       return map;
     }, {});
   }
-
   return JSON.parse(JSON.stringify(obj));
 }
 
