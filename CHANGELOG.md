@@ -8,4 +8,4 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Updated
 
-- [IMPORTANT!] Exceptions return only the response data details for axios errors, no headers.
+- [IMPORTANT!] HttpClient throws serialized Axios errors through ClientExceptions.
