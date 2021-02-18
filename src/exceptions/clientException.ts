@@ -1,5 +1,5 @@
-import axios, { AxiosError } from 'axios';
 import { Exception } from './exception';
+import { SerializedError } from '../util';
 
 export class ClientException extends Exception {
   public readonly originalStatusCode?: number;
@@ -11,28 +11,25 @@ export class ClientException extends Exception {
     404: 422,
   };
 
-  constructor(serviceName: string, error?: AxiosError | unknown) {
-    super('Dependent service returned error', ClientException.convertStatusCode(error), {
-      error,
-      serviceName,
-    });
+  constructor(serviceName: string, error?: SerializedError | any) {
+    const originalStatusCode = error?.status ?? undefined;
 
-    this.originalStatusCode = axios.isAxiosError(error) ? error.response?.status : undefined;
+    super(
+      'Dependent service returned error',
+      ClientException.convertStatusCode(originalStatusCode),
+      {
+        error,
+        serviceName,
+      },
+    );
+    this.originalStatusCode = originalStatusCode;
   }
 
-  private static convertStatusCode(details?: AxiosError | unknown) {
+  private static convertStatusCode(originalStatusCode?: number) {
     let statusCode = 503;
 
-    if (axios.isAxiosError(details)) {
-      const originalStatusCode = details.response?.status;
-      if (
-        originalStatusCode &&
-        this.statusCodeMap[originalStatusCode] &&
-        this.statusCodeMap[originalStatusCode] &&
-        this.statusCodeMap[originalStatusCode]
-      ) {
-        statusCode = this.statusCodeMap[originalStatusCode];
-      }
+    if (originalStatusCode && this.statusCodeMap[originalStatusCode]) {
+      statusCode = this.statusCodeMap[originalStatusCode];
     }
 
     return statusCode;
