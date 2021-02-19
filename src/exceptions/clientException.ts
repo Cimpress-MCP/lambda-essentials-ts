@@ -1,5 +1,5 @@
 import { Exception } from './exception';
-import { SerializedError } from '../util';
+import { SerializedAxiosError } from '../util';
 
 export class ClientException extends Exception {
   public readonly originalStatusCode?: number;
@@ -11,7 +11,7 @@ export class ClientException extends Exception {
     404: 422,
   };
 
-  constructor(serviceName: string, error?: SerializedError | any) {
+  constructor(serviceName: string, error?: SerializedAxiosError | any) {
     const originalStatusCode = error?.status ?? undefined;
 
     super(

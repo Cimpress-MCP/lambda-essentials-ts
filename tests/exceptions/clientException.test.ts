@@ -1,5 +1,5 @@
 import { ClientException } from '../../src';
-import { SerializedError } from '../../src/util';
+import { SerializedAxiosError } from '../../src/util';
 
 interface AxiosErrorTestData {
   originalStatusCode: number;
@@ -10,7 +10,7 @@ describe('ClientException', () => {
   describe('converts Axios errors', () => {
     const testServiceName = 'test-service-name';
 
-    const createError = (status: number): SerializedError => ({
+    const createError = (status: number): SerializedAxiosError => ({
       status,
       statusText: 'Test',
       data: [],
