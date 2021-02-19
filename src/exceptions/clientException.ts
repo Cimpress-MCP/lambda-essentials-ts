@@ -1,4 +1,3 @@
-import axios, { AxiosError } from 'axios';
 import { Exception } from './exception';
 
 export class ClientException extends Exception {
@@ -11,28 +10,23 @@ export class ClientException extends Exception {
     404: 422,
   };
 
-  constructor(serviceName: string, error?: AxiosError | unknown) {
-    super('Dependent service returned error', ClientException.convertStatusCode(error), {
-      error,
-      serviceName,
-    });
-
-    this.originalStatusCode = axios.isAxiosError(error) ? error.response?.status : undefined;
+  constructor(serviceName: string, originalStatusCode?: number, error?: any) {
+    super(
+      'Dependent service returned error',
+      ClientException.convertStatusCode(originalStatusCode),
+      {
+        error,
+        serviceName,
+      },
+    );
+    this.originalStatusCode = originalStatusCode;
   }
 
-  private static convertStatusCode(details?: AxiosError | unknown) {
+  private static convertStatusCode(originalStatusCode?: number) {
     let statusCode = 503;
 
-    if (axios.isAxiosError(details)) {
-      const originalStatusCode = details.response?.status;
-      if (
-        originalStatusCode &&
-        this.statusCodeMap[originalStatusCode] &&
-        this.statusCodeMap[originalStatusCode] &&
-        this.statusCodeMap[originalStatusCode]
-      ) {
-        statusCode = this.statusCodeMap[originalStatusCode];
-      }
+    if (originalStatusCode && this.statusCodeMap[originalStatusCode]) {
+      statusCode = this.statusCodeMap[originalStatusCode];
     }
 
     return statusCode;

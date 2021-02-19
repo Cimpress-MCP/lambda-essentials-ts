@@ -1,5 +1,5 @@
-import { AxiosError } from 'axios';
 import { ClientException } from '../../src';
+import { SerializedAxiosError } from '../../src/util';
 
 interface AxiosErrorTestData {
   originalStatusCode: number;
@@ -10,20 +10,10 @@ describe('ClientException', () => {
   describe('converts Axios errors', () => {
     const testServiceName = 'test-service-name';
 
-    const createAxiosError = (status: number): AxiosError => ({
-      isAxiosError: true,
-      config: {},
-      toJSON: () => ({}),
-      name: 'test axios error name',
-      message: 'test axios error message',
-      response: {
-        config: {},
-        headers: {},
-        request: {},
-        data: {},
-        statusText: 'test axios error status text',
-        status,
-      },
+    const createError = (status: number): SerializedAxiosError => ({
+      status,
+      statusText: 'Test',
+      data: [],
     });
 
     const testData: AxiosErrorTestData[] = [
@@ -47,8 +37,8 @@ describe('ClientException', () => {
 
     testData.map(({ exceptionStatusCode, originalStatusCode }) =>
       test(`from ${originalStatusCode} to ${exceptionStatusCode}`, () => {
-        const axiosError = createAxiosError(originalStatusCode);
-        const clientException = new ClientException(testServiceName, axiosError);
+        const axiosError = createError(originalStatusCode);
+        const clientException = new ClientException(testServiceName, axiosError.status, axiosError);
 
         expect(clientException.message).toEqual('Dependent service returned error');
         expect(clientException.originalStatusCode).toEqual(originalStatusCode);

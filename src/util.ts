@@ -12,9 +12,7 @@ export function serializeObject(obj: unknown): object {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export function serializeAxiosError(
-  error: AxiosError,
-): { status: number; statusText: string; data: any } | undefined {
+export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
   if (!error.response) {
     return undefined;
   }
@@ -25,4 +23,10 @@ export function serializeAxiosError(
     statusText,
     data,
   };
+}
+
+export interface SerializedAxiosError {
+  status: number;
+  statusText: string;
+  data: any;
 }

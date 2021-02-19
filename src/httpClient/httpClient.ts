@@ -73,36 +73,38 @@ export default class HttpClient {
         return config;
       },
       (error: AxiosError) => {
+        const serializedAxiosError = serializeAxiosError(error);
         this.logFunction({
           title: 'HTTP Request Error',
           level: 'WARN',
-          error: serializeAxiosError(error),
+          error: serializedAxiosError,
         });
 
         const hostname = error.config?.url ? new URL(error.config.url).hostname : 'N/A';
-        throw new ClientException(hostname, error);
+        throw new ClientException(hostname, serializedAxiosError?.status, serializedAxiosError);
       },
     );
 
     this.client.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
+        const serializedAxiosError = serializeAxiosError(error);
         if (error.message === invalidToken) {
           this.logFunction({
             title: 'HTTP call skipped due to a token error',
             level: 'INFO',
-            error: serializeAxiosError(error),
+            error: serializedAxiosError,
           });
         } else {
           this.logFunction({
             title: 'HTTP Response Error',
             level: 'INFO',
-            error: serializeAxiosError(error),
+            error: serializedAxiosError,
           });
         }
 
         const hostname = error.config?.url ? new URL(error.config.url).hostname : 'N/A';
-        throw new ClientException(hostname, error);
+        throw new ClientException(hostname, serializedAxiosError?.status, serializedAxiosError);
       },
     );
   }
