@@ -1,5 +1,4 @@
 import { Exception } from './exception';
-import { SerializedAxiosError } from '../util';
 
 export class ClientException extends Exception {
   public readonly originalStatusCode?: number;
@@ -11,9 +10,7 @@ export class ClientException extends Exception {
     404: 422,
   };
 
-  constructor(serviceName: string, error?: SerializedAxiosError | any) {
-    const originalStatusCode = error?.status ?? undefined;
-
+  constructor(serviceName: string, originalStatusCode?: number, error?: any) {
     super(
       'Dependent service returned error',
       ClientException.convertStatusCode(originalStatusCode),

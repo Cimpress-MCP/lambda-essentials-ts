@@ -38,7 +38,7 @@ describe('ClientException', () => {
     testData.map(({ exceptionStatusCode, originalStatusCode }) =>
       test(`from ${originalStatusCode} to ${exceptionStatusCode}`, () => {
         const axiosError = createError(originalStatusCode);
-        const clientException = new ClientException(testServiceName, axiosError);
+        const clientException = new ClientException(testServiceName, axiosError.status, axiosError);
 
         expect(clientException.message).toEqual('Dependent service returned error');
         expect(clientException.originalStatusCode).toEqual(originalStatusCode);

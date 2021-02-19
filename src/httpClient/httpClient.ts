@@ -81,7 +81,7 @@ export default class HttpClient {
         });
 
         const hostname = error.config?.url ? new URL(error.config.url).hostname : 'N/A';
-        throw new ClientException(hostname, serializedAxiosError);
+        throw new ClientException(hostname, serializedAxiosError?.status, serializedAxiosError);
       },
     );
 
@@ -104,7 +104,7 @@ export default class HttpClient {
         }
 
         const hostname = error.config?.url ? new URL(error.config.url).hostname : 'N/A';
-        throw new ClientException(hostname, serializedAxiosError);
+        throw new ClientException(hostname, serializedAxiosError?.status, serializedAxiosError);
       },
     );
   }
