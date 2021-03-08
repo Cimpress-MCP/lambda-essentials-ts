@@ -1,6 +1,6 @@
 import { ApiRequest } from '../../src/openApi/apiRequestModel';
 import OpenApiWrapper from '../../src/openApi/openApiWrapper';
-import { ForbiddenException, InternalException } from '../../src';
+import { ClientException, ForbiddenException, InternalException } from '../../src';
 import { ApiResponse } from '../../src/openApi/apiResponseModel';
 
 describe('Open API Wrapper', () => {
@@ -133,6 +133,36 @@ describe('Open API Wrapper', () => {
         details: exception.details,
         statusCode: 500,
         message: 'Internal Server Error',
+        stack: expect.any(String),
+      });
+    });
+
+    test('returns 500 and logs INFO with details when ClientException exception is caught', async () => {
+      const exception = new ClientException('test-service-name', 409, { more: 'details' });
+      const expected: Partial<ApiResponse> = {
+        body: {
+          details: exception.details,
+          title: 'Dependent service returned error',
+        },
+        statusCode: 503,
+        headers: {
+          'orion-correlation-id-root': 'not-set',
+        },
+      };
+
+      const logger = new LoggerMock();
+      const openApi = new OpenApiWrapper(logger);
+      const actual = openApi.api.errorMiddleware(request, exception);
+
+      expect(actual).toEqual(expected);
+      expect(logger.log).toBeCalledWith({
+        level: 'INFO',
+        title: 'ErrorLogger',
+        details: exception.details,
+        statusCode: 503,
+        message: 'Dependent service returned error',
+        originalStatusCode: 409,
+        serviceName: 'test-service-name',
         stack: expect.any(String),
       });
     });

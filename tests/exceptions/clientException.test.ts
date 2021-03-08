@@ -43,10 +43,8 @@ describe('ClientException', () => {
         expect(clientException.message).toEqual('Dependent service returned error');
         expect(clientException.originalStatusCode).toEqual(originalStatusCode);
         expect(clientException.statusCode).toEqual(exceptionStatusCode);
-        expect(clientException.details).toEqual({
-          serviceName: testServiceName,
-          error: axiosError,
-        });
+        expect(clientException.serviceName).toEqual(testServiceName);
+        expect(clientException.details).toEqual(axiosError);
       }),
     );
   });
