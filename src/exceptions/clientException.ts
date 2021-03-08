@@ -14,7 +14,7 @@ export class ClientException extends Exception {
 
   constructor(serviceName: string, originalStatusCode?: number, details?: any) {
     super(
-      'Dependent service returned error',
+      `Dependent service "${serviceName}" returned error`,
       ClientException.convertStatusCode(originalStatusCode),
       details,
     );
