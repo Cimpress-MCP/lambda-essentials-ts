@@ -1,6 +1,8 @@
 import { Exception } from './exception';
 
 export class ClientException extends Exception {
+  public readonly serviceName: string;
+
   public readonly originalStatusCode?: number;
 
   private static readonly statusCodeMap: Record<number, number> = {
@@ -10,15 +12,13 @@ export class ClientException extends Exception {
     404: 422,
   };
 
-  constructor(serviceName: string, originalStatusCode?: number, error?: any) {
+  constructor(serviceName: string, originalStatusCode?: number, details?: any) {
     super(
       'Dependent service returned error',
       ClientException.convertStatusCode(originalStatusCode),
-      {
-        error,
-        serviceName,
-      },
+      details,
     );
+    this.serviceName = serviceName;
     this.originalStatusCode = originalStatusCode;
   }
 
