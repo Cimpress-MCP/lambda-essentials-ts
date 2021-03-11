@@ -1,4 +1,5 @@
-import { serializeObject } from '../src';
+import { AxiosError } from 'axios';
+import { serializeAxiosError, serializeObject } from '../src';
 
 describe('Util', () => {
   const message = 'tests-error-message';
@@ -32,6 +33,33 @@ describe('Util', () => {
       };
 
       const serializedError = serializeObject(expected);
+      expect(serializedError).toEqual(expected);
+    });
+  });
+
+  describe('serializeAxiosError', () => {
+    const axiosError: AxiosError = {
+      isAxiosError: true,
+      message: 'test-message',
+      response: {
+        data: {
+          details: 'test-details',
+        },
+        status: 409,
+        config: {},
+        headers: null,
+        statusText: 'test-status-text',
+      },
+      config: {},
+      name: 'test-name',
+      toJSON: () => ({}),
+    };
+    test('serializes AxiosError objects', () => {
+      const expected = {
+        details: 'test-details',
+        status: 409,
+      };
+      const serializedError = serializeAxiosError(axiosError);
       expect(serializedError).toEqual(expected);
     });
   });

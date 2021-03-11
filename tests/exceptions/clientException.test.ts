@@ -12,8 +12,7 @@ describe('ClientException', () => {
 
     const createError = (status: number): SerializedAxiosError => ({
       status,
-      statusText: 'Test',
-      data: [],
+      details: [],
     });
 
     const testData: AxiosErrorTestData[] = [
