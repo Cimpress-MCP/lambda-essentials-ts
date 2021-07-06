@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [2.2.0] - 2021-07-06
+
+### Changed
+
+- `HttpClient` now does not create informational request logs by default.
+
+### Added
+
+- `HttpClientOptions` has now accepts `LogOptions` object that allows enabling informational request and response logs.
+
+```js
+{
+  logOptions: {
+    logData: [LogData.requests, LogData.responses];
+  }
+}
+```
+
 ## [2.1.0] - 2021-03-11
 
 ### Changed
