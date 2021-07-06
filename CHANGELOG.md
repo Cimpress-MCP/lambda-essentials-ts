@@ -8,16 +8,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 
-- `HttpClient` now does not create informational request logs by default.
+- `HttpClient` logs additional request data (query parameters, body).
 
 ### Added
 
-- `HttpClientOptions` has now accepts `LogOptions` object that allows enabling informational request and response logs.
+- `HttpClientOptions` now accepts `LogOptions` object that allows enabling informational request and **response (new)** logs.
 
 ```js
 {
   logOptions: {
-    logData: [LogData.requests, LogData.responses];
+    enabledLogs: [LogType.requests, LogType.responses];
   }
 }
 ```

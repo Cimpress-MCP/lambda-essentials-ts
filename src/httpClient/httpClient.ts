@@ -12,7 +12,7 @@ import cacheAdapterEnhancer, {
 import retryAdapterEnhancer, {
   Options as RetryOptions,
 } from 'axios-extensions/lib/retryAdapterEnhancer';
-import { serializeAxiosError } from '../util';
+import { safeJsonParse, serializeAxiosError } from '../util';
 import { InternalException } from '../exceptions/internalException';
 import { ClientException } from '../exceptions/clientException';
 import { orionCorrelationIdRoot } from '../shared';
@@ -22,7 +22,7 @@ const invalidToken: string = 'Invalid token';
 /**
  * Allows to specify which http data should be logged.
  */
-export enum LogData {
+export enum LogType {
   requests = 'requests',
   responses = 'responses',
 }
@@ -48,7 +48,7 @@ export default class HttpClient {
   constructor(options?: HttpClientOptions) {
     // eslint-disable-next-line no-console
     this.logFunction = options?.logFunction ?? console.log;
-    this.logOptions = options?.logOptions ?? { logData: [] };
+    this.logOptions = options?.logOptions ?? { enabledLogs: [LogType.requests] };
     this.tokenResolverFunction = options?.tokenResolver;
     this.correlationIdResolverFunction = options?.correlationIdResolver;
     this.enableCache = options?.enableCache ?? false;
@@ -70,14 +70,14 @@ export default class HttpClient {
 
     this.client.interceptors.request.use(
       (config) => {
-        if (this.logOptions.logData.includes(LogData.requests)) {
+        if (this.logOptions.enabledLogs.includes(LogType.requests)) {
           this.logFunction({
             title: 'HTTP Request',
             level: 'INFO',
             method: config.method,
             url: config.url,
             query: config.params,
-            body: config.data,
+            request: config.data,
             correlationId: config.headers[orionCorrelationIdRoot],
           });
         }
@@ -107,23 +107,14 @@ export default class HttpClient {
 
     this.client.interceptors.response.use(
       (response) => {
-        if (this.logOptions.logData.includes(LogData.responses)) {
-          let parsedRequestBody;
-          if (response.config.data) {
-            try {
-              parsedRequestBody = JSON.parse(response.config.data);
-            } catch (e) {
-              parsedRequestBody = response.config.data;
-            }
-          }
-
+        if (this.logOptions.enabledLogs.includes(LogType.responses)) {
           this.logFunction({
             title: 'HTTP Response',
             level: 'INFO',
             method: response.config.method,
             url: response.config.url,
             query: response.config.params,
-            request: parsedRequestBody,
+            request: safeJsonParse(response.config.data, response.config.data),
             response: response.data,
             correlationId: response.config.headers[orionCorrelationIdRoot],
           });
@@ -307,5 +298,5 @@ export interface HttpClientOptions {
  * Log options object.
  */
 export interface LogOptions {
-  logData: LogData[];
+  enabledLogs: LogType[];
 }
