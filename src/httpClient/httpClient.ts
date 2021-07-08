@@ -12,15 +12,25 @@ import cacheAdapterEnhancer, {
 import retryAdapterEnhancer, {
   Options as RetryOptions,
 } from 'axios-extensions/lib/retryAdapterEnhancer';
-import { serializeAxiosError } from '../util';
+import { safeJsonParse, serializeAxiosError } from '../util';
 import { InternalException } from '../exceptions/internalException';
 import { ClientException } from '../exceptions/clientException';
 import { orionCorrelationIdRoot } from '../shared';
 
 const invalidToken: string = 'Invalid token';
 
+/**
+ * Allows to specify which http data should be logged.
+ */
+export enum LogType {
+  requests = 'requests',
+  responses = 'responses',
+}
+
 export default class HttpClient {
   private readonly logFunction: (...msg: any) => void;
+
+  private readonly logOptions: LogOptions;
 
   private readonly tokenResolverFunction?: () => Promise<string>;
 
@@ -38,6 +48,7 @@ export default class HttpClient {
   constructor(options?: HttpClientOptions) {
     // eslint-disable-next-line no-console
     this.logFunction = options?.logFunction ?? console.log;
+    this.logOptions = options?.logOptions ?? { enabledLogs: [LogType.requests] };
     this.tokenResolverFunction = options?.tokenResolver;
     this.correlationIdResolverFunction = options?.correlationIdResolver;
     this.enableCache = options?.enableCache ?? false;
@@ -59,13 +70,17 @@ export default class HttpClient {
 
     this.client.interceptors.request.use(
       (config) => {
-        this.logFunction({
-          title: 'HTTP Request',
-          level: 'INFO',
-          method: config.method,
-          url: config.url,
-          correlationId: config.headers[orionCorrelationIdRoot],
-        });
+        if (this.logOptions.enabledLogs.includes(LogType.requests)) {
+          this.logFunction({
+            title: 'HTTP Request',
+            level: 'INFO',
+            method: config.method,
+            url: config.url,
+            query: config.params,
+            request: config.data,
+            correlationId: config.headers[orionCorrelationIdRoot],
+          });
+        }
 
         if (!config.url) {
           throw new InternalException('HttpClient Error: "url" must be defined');
@@ -78,6 +93,7 @@ export default class HttpClient {
           title: 'HTTP Request Error',
           level: 'WARN',
           error: serializedAxiosError,
+          correlationId: error.request.headers[orionCorrelationIdRoot],
         });
 
         const hostname = error.config?.url ? new URL(error.config.url).hostname : 'N/A';
@@ -90,7 +106,22 @@ export default class HttpClient {
     );
 
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        if (this.logOptions.enabledLogs.includes(LogType.responses)) {
+          this.logFunction({
+            title: 'HTTP Response',
+            level: 'INFO',
+            method: response.config.method,
+            url: response.config.url,
+            query: response.config.params,
+            request: safeJsonParse(response.config.data, response.config.data),
+            response: response.data,
+            correlationId: response.config.headers[orionCorrelationIdRoot],
+          });
+        }
+
+        return response;
+      },
       (error: AxiosError) => {
         const serializedAxiosError = serializeAxiosError(error);
         if (error.message === invalidToken) {
@@ -98,12 +129,14 @@ export default class HttpClient {
             title: 'HTTP call skipped due to a token error',
             level: 'INFO',
             error: serializedAxiosError,
+            correlationId: error.request.headers[orionCorrelationIdRoot],
           });
         } else {
           this.logFunction({
             title: 'HTTP Response Error',
             level: 'INFO',
             error: serializedAxiosError,
+            correlationId: error.request.headers[orionCorrelationIdRoot],
           });
         }
 
@@ -234,6 +267,10 @@ export interface HttpClientOptions {
    */
   logFunction?: (...msg) => void;
   /**
+   * Logger options
+   */
+  logOptions?: LogOptions;
+  /**
    * A function that returns a correlation ID
    */
   correlationIdResolver?: () => string;
@@ -255,4 +292,11 @@ export interface HttpClientOptions {
    * @link https://github.com/kuitos/axios-extensions#cacheadapterenhancer
    */
   retryOptions?: RetryOptions;
+}
+
+/**
+ * Log options object.
+ */
+export interface LogOptions {
+  enabledLogs: LogType[];
 }

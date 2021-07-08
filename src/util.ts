@@ -1,5 +1,13 @@
 import { AxiosError } from 'axios';
 
+export function safeJsonParse(input: any, defaultValue: unknown): unknown {
+  try {
+    return JSON.parse(input);
+  } catch (e) {
+    return defaultValue;
+  }
+}
+
 export function serializeObject(obj: unknown): object {
   if (obj && typeof obj === 'object') {
     return Object.getOwnPropertyNames(obj).reduce((map, key) => {

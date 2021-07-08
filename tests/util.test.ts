@@ -1,9 +1,30 @@
 import { AxiosError } from 'axios';
 import { serializeAxiosError, serializeObject } from '../src';
+import { safeJsonParse } from '../src/util';
 
 describe('Util', () => {
   const message = 'tests-error-message';
   const error = new Error(message);
+
+  describe('safeJsonParse', () => {
+    test('returns null when input string is null', () => {
+      const expected = null;
+      const parsedJson = safeJsonParse(null, 'default-value');
+      expect(parsedJson).toEqual(expected);
+    });
+
+    test('returns object when input string is valid JSON', () => {
+      const expected = { valid: 'json' };
+      const parsedJson = safeJsonParse(JSON.stringify(expected), undefined);
+      expect(parsedJson).toEqual(expected);
+    });
+
+    test('returns default value when input string is invalid JSON', () => {
+      const expected = 'default-value';
+      const parsedJson = safeJsonParse('not-a-json', expected);
+      expect(parsedJson).toEqual(expected);
+    });
+  });
 
   describe('serialize', () => {
     test('serializes Error objects', () => {
