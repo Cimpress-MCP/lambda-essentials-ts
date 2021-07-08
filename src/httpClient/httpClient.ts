@@ -74,11 +74,7 @@ export default class HttpClient {
           this.logFunction({
             title: 'HTTP Request',
             level: 'INFO',
-            method: config.method,
-            url: config.url,
-            query: config.params,
-            request: config.data,
-            correlationId: config.headers[orionCorrelationIdRoot],
+            ...HttpClient.extractRequestLogData(config),
           });
         }
 
@@ -92,8 +88,8 @@ export default class HttpClient {
         this.logFunction({
           title: 'HTTP Request Error',
           level: 'WARN',
+          ...HttpClient.extractRequestLogData(error.config),
           error: serializedAxiosError,
-          correlationId: error.request.headers[orionCorrelationIdRoot],
         });
 
         const hostname = error.config?.url ? new URL(error.config.url).hostname : 'N/A';
@@ -111,12 +107,8 @@ export default class HttpClient {
           this.logFunction({
             title: 'HTTP Response',
             level: 'INFO',
-            method: response.config.method,
-            url: response.config.url,
-            query: response.config.params,
-            request: safeJsonParse(response.config.data, response.config.data),
+            ...HttpClient.extractRequestLogData(response.config),
             response: response.data,
-            correlationId: response.config.headers[orionCorrelationIdRoot],
           });
         }
 
@@ -128,15 +120,15 @@ export default class HttpClient {
           this.logFunction({
             title: 'HTTP call skipped due to a token error',
             level: 'INFO',
+            ...HttpClient.extractRequestLogData(error.config),
             error: serializedAxiosError,
-            correlationId: error.request.headers[orionCorrelationIdRoot],
           });
         } else {
           this.logFunction({
             title: 'HTTP Response Error',
             level: 'INFO',
+            ...HttpClient.extractRequestLogData(error.config),
             error: serializedAxiosError,
-            correlationId: error.request.headers[orionCorrelationIdRoot],
           });
         }
 
@@ -148,6 +140,20 @@ export default class HttpClient {
         );
       },
     );
+  }
+
+  private static extractRequestLogData(requestConfig?: AxiosRequestConfig): object {
+    if (!requestConfig) {
+      return {};
+    }
+
+    return {
+      method: requestConfig.method,
+      url: requestConfig.url,
+      query: requestConfig.params,
+      request: safeJsonParse(requestConfig.data, requestConfig.data),
+      correlationId: requestConfig.headers?.[orionCorrelationIdRoot],
+    };
   }
 
   /**

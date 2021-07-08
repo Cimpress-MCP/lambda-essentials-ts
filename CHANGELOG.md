@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [2.2.2] - 2021-07-08
+
+### Fixed bugs
+
+- Some HTTP error log statements were throwing exceptions. This was due to accessing `error.request.headers[orionCorrelationIdRoot]`
+  from Axios error object, where the `headers` object was `undefined`. The correct field was `error.config.headers`.
+
 ## [2.2.1] - 2021-07-08
 
 ### Changed
