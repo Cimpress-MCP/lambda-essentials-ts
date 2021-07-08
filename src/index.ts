@@ -1,4 +1,8 @@
-import HttpClient, { HttpClientOptions } from './httpClient/httpClient';
+import HttpClient, {
+  HttpClientOptions,
+  HttpLogOptions,
+  HttpLogType,
+} from './httpClient/httpClient';
 import Logger, { LoggerConfiguration, SuggestedLogObject } from './logger/logger';
 import OpenApiWrapper from './openApi/openApiWrapper';
 import { ApiResponse } from './openApi/apiResponseModel';
@@ -23,6 +27,7 @@ export {
   OpenApiWrapper,
   ApiResponse,
   HttpClient,
+  HttpLogType,
   TokenProvider,
   ValidationException,
   NotFoundException,
@@ -40,6 +45,7 @@ export type {
   LoggerConfiguration,
   SuggestedLogObject,
   HttpClientOptions,
+  HttpLogOptions,
   ApiRequest,
   GetRequest,
   PostRequest,
