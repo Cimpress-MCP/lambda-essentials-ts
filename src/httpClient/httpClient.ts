@@ -22,7 +22,7 @@ const invalidToken: string = 'Invalid token';
 /**
  * Allows to specify which http data should be logged.
  */
-export enum LogType {
+export enum HttpLogType {
   requests = 'requests',
   responses = 'responses',
 }
@@ -30,7 +30,7 @@ export enum LogType {
 export default class HttpClient {
   private readonly logFunction: (...msg: any) => void;
 
-  private readonly logOptions: LogOptions;
+  private readonly logOptions: HttpLogOptions;
 
   private readonly tokenResolverFunction?: () => Promise<string>;
 
@@ -48,7 +48,7 @@ export default class HttpClient {
   constructor(options?: HttpClientOptions) {
     // eslint-disable-next-line no-console
     this.logFunction = options?.logFunction ?? console.log;
-    this.logOptions = options?.logOptions ?? { enabledLogs: [LogType.requests] };
+    this.logOptions = options?.logOptions ?? { enabledLogs: [HttpLogType.requests] };
     this.tokenResolverFunction = options?.tokenResolver;
     this.correlationIdResolverFunction = options?.correlationIdResolver;
     this.enableCache = options?.enableCache ?? false;
@@ -70,7 +70,7 @@ export default class HttpClient {
 
     this.client.interceptors.request.use(
       (config) => {
-        if (this.logOptions.enabledLogs.includes(LogType.requests)) {
+        if (this.logOptions.enabledLogs.includes(HttpLogType.requests)) {
           this.logFunction({
             title: 'HTTP Request',
             level: 'INFO',
@@ -107,7 +107,7 @@ export default class HttpClient {
 
     this.client.interceptors.response.use(
       (response) => {
-        if (this.logOptions.enabledLogs.includes(LogType.responses)) {
+        if (this.logOptions.enabledLogs.includes(HttpLogType.responses)) {
           this.logFunction({
             title: 'HTTP Response',
             level: 'INFO',
@@ -269,7 +269,7 @@ export interface HttpClientOptions {
   /**
    * Logger options
    */
-  logOptions?: LogOptions;
+  logOptions?: HttpLogOptions;
   /**
    * A function that returns a correlation ID
    */
@@ -297,6 +297,6 @@ export interface HttpClientOptions {
 /**
  * Log options object.
  */
-export interface LogOptions {
-  enabledLogs: LogType[];
+export interface HttpLogOptions {
+  enabledLogs: HttpLogType[];
 }

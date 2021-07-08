@@ -45,11 +45,12 @@ export const lambdaHandler = api.handler;
 ### HttpClient
 
 ```typescript
-import { HttpClient, Logger } from 'lambda-essentials-ts';
+import { HttpClient, HttpLogType, Logger } from 'lambda-essentials-ts';
 
 let logger = new Logger();
 let httpClient = new HttpClient({
   logFunction: (msg) => logger.log(msg),
+  logOptions: { enabledLogs: [HttpLogType.requests] },
   tokenResolver: () => Promise.resolve('exampleAccessToken'),
 });
 
