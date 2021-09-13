@@ -52,6 +52,15 @@ let httpClient = new HttpClient({
   logFunction: (msg) => logger.log(msg),
   logOptions: { enabledLogs: [HttpLogType.requests] },
   tokenResolver: () => Promise.resolve('exampleAccessToken'),
+  enableRetry: true,
+  retryOptions: {
+    retry: 3,
+    statusCodesToRetry: [
+      [100, 199],
+      [429, 429],
+      [500, 599],
+    ],
+  },
 });
 
 let headers = {};
