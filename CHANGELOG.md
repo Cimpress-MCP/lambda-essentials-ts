@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [3.0.0] - 2021-09-10
+
+### Changed
+
+- `HttpClient` the [retryAdapterEnhancer axios adapter](https://github.com/kuitos/axios-extensions#retryadapterenhancer)
+  was replaced by the more flexible [retry-axios interceptor](https://github.com/JustinBeckwith/retry-axios).
+- **[Breaking change]** `HttpClientOptions.retryOptions` now accepts [extensive retry configuration](https://github.com/JustinBeckwith/retry-axios/blob/v2.6.0/src/index.ts#L11)
+  such as specifying HTTP status codes that should be retried.
+- **[Breaking change]** All HTTP status codes are no longer retried by default. The new default are these ranges:
+  - [100, 199] Informational, request still processing
+  - [429, 429] Too Many Requests
+  - [500, 599] Server errors
+
 ## [2.2.2] - 2021-07-08
 
 ### Fixed bugs

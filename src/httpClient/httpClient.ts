@@ -9,9 +9,8 @@ import axios, {
 import cacheAdapterEnhancer, {
   Options as CacheOptions,
 } from 'axios-extensions/lib/cacheAdapterEnhancer';
-import retryAdapterEnhancer, {
-  Options as RetryOptions,
-} from 'axios-extensions/lib/retryAdapterEnhancer';
+import * as rax from 'retry-axios';
+import { RetryConfig } from 'retry-axios';
 import { safeJsonParse, serializeAxiosError } from '../util';
 import { InternalException } from '../exceptions/internalException';
 import { ClientException } from '../exceptions/clientException';
@@ -61,12 +60,28 @@ export default class HttpClient {
           if (this.enableCache) {
             adapters = cacheAdapterEnhancer(adapters, options?.cacheOptions);
           }
-          if (this.enableRetry) {
-            adapters = retryAdapterEnhancer(adapters, options?.retryOptions);
-          }
           return adapters;
         })(),
       });
+
+    if (this.enableRetry) {
+      this.client.defaults.raxConfig = {
+        ...options?.retryOptions,
+        instance: this.client, // always attach retry-axios to the private axios client
+        httpMethodsToRetry: ['GET', 'HEAD', 'OPTIONS', 'DELETE', 'PUT', 'POST'], // extending the defaults to retry POST calls
+        onRetryAttempt: (err) => {
+          this.logFunction({
+            title: 'HTTP Response Error Retry',
+            level: 'INFO',
+            retryAttempt: err.config?.raxConfig?.currentRetryAttempt,
+            ...HttpClient.extractRequestLogData(err.config),
+            error: serializeAxiosError(err),
+          });
+        },
+      };
+      // attach retry-axios
+      rax.attach(this.client);
+    }
 
     this.client.interceptors.request.use(
       (config) => {
@@ -114,7 +129,13 @@ export default class HttpClient {
 
         return response;
       },
-      (error: AxiosError) => {
+      (error: AxiosError | ClientException) => {
+        // when retries are configured, this middleware gets triggered for each retry
+        // it changes the error object to ClientException and therefore the transformation can be run only once
+        if (error instanceof ClientException) {
+          throw error;
+        }
+
         const serializedAxiosError = serializeAxiosError(error);
         if (error.message === invalidToken) {
           this.logFunction({
@@ -295,9 +316,9 @@ export interface HttpClientOptions {
   enableRetry?: boolean;
   /**
    * Retry options
-   * @link https://github.com/kuitos/axios-extensions#cacheadapterenhancer
+   * @link https://github.com/JustinBeckwith/retry-axios/blob/v2.6.0/src/index.ts#L11
    */
-  retryOptions?: RetryOptions;
+  retryOptions?: RetryConfig;
 }
 
 /**
