@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [3.0.1] - 2021-09-13
+
+### Fixed
+
+- Downgraded Axios to 0.21.1 due to response interceptors not being applied correctly in 0.21.2. [There has been a fix to
+  axios but a version with the fix is not available yet.](https://github.com/axios/axios/commit/83ae3830e4070adbcdcdcdd6e8afbac568afd708)
+
 ## [3.0.0] - 2021-09-10
 
 ### Changed
