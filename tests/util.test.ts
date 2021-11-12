@@ -1,10 +1,32 @@
 import { AxiosError } from 'axios';
 import { serializeAxiosError, serializeObject } from '../src';
-import { safeJsonParse } from '../src/util';
+import { safeJsonParse, safeJwtCanonicalIdParse } from '../src/util';
 
 describe('Util', () => {
   const message = 'tests-error-message';
   const error = new Error(message);
+
+  describe('safeJwtCanonicalIdParse', () => {
+    test('returns undefined when the JWT is undefined', () => {
+      const expected = undefined;
+      const parsedJson = safeJwtCanonicalIdParse(undefined!);
+      expect(parsedJson).toEqual(expected);
+    });
+
+    test('returns undefined when the JWT is invalid', () => {
+      const expected = undefined;
+      const parsedJson = safeJwtCanonicalIdParse('invalid-jwt-token');
+      expect(parsedJson).toEqual(expected);
+    });
+
+    test('returns canonical_id when the JWT is valid and contains the claim', () => {
+      const expected = 'test@user.com';
+      const parsedJson = safeJwtCanonicalIdParse(
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MzY3MzM0MDMsImV4cCI6MTY2ODI2OTQwMywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoidGVzdEB1c2VyLmNvbSIsImh0dHBzOi8vY2xhaW1zLmNpbXByZXNzLmlvL2Nhbm9uaWNhbF9pZCI6InRlc3RAdXNlci5jb20ifQ.gArhFpdphmxnQEyMNSSFfWbY3CU6IngxGhheXLNgc8w',
+      );
+      expect(parsedJson).toEqual(expected);
+    });
+  });
 
   describe('safeJsonParse', () => {
     test('returns null when input string is null', () => {

@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [4.0.0] - 2021-11-12
+
+### Changed
+
+- `HttpClient` the [retryAdapterEnhancer axios adapter](https://github.com/kuitos/axios-extensions#cacheadapterenhancer)
+  was replaced by the more flexible [axios-cache-adapter](https://github.com/RasCarlito/axios-cache-adapter).
+- **[Breaking change]** `HttpClientOptions.cacheOptions` now accepts [extensive cache configuration](https://github.com/RasCarlito/axios-cache-adapter/blob/master/axios-cache-adapter.d.ts#L26).
+- The cache is now partitioned by `canonical_id` JWT claim.
+
 ## [3.0.1] - 2021-09-13
 
 ### Fixed

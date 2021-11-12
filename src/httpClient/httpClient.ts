@@ -1,3 +1,4 @@
+import * as uuid from 'uuid';
 import { URL } from 'url';
 import axios, {
   AxiosAdapter,
@@ -6,15 +7,15 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from 'axios';
-import cacheAdapterEnhancer, {
-  Options as CacheOptions,
-} from 'axios-extensions/lib/cacheAdapterEnhancer';
+import { IAxiosCacheAdapterOptions, setupCache } from 'axios-cache-adapter';
 import * as rax from 'retry-axios';
 import { RetryConfig } from 'retry-axios';
-import { safeJsonParse, serializeAxiosError } from '../util';
+import md5 from 'md5';
+import { safeJwtCanonicalIdParse, safeJsonParse, serializeAxiosError } from '../util';
 import { InternalException } from '../exceptions/internalException';
 import { ClientException } from '../exceptions/clientException';
 import { orionCorrelationIdRoot } from '../shared';
+import { createDebounceRequestAdapter } from './deduplicateRequestAdapter';
 
 const invalidToken: string = 'Invalid token';
 
@@ -58,7 +59,19 @@ export default class HttpClient {
         adapter: (() => {
           let adapters = axios.defaults.adapter as AxiosAdapter;
           if (this.enableCache) {
-            adapters = cacheAdapterEnhancer(adapters, options?.cacheOptions);
+            const cache = setupCache({
+              maxAge: 5 * 60 * 1000, // all items are cached for 5 minutes
+              readHeaders: false, // ignore cache control headers in favor of the static 5 minutes
+              readOnError: true,
+              exclude: {
+                query: false, // also cache requests with query parameters
+              },
+              ...options?.cacheOptions, // allow to overwrite the defaults except of cache-key
+              key: (req) => HttpClient.generateCacheKey(req),
+            });
+
+            // debounce concurrent calls with the same cacheKey so that only one HTTP request is made
+            adapters = createDebounceRequestAdapter(cache.adapter, HttpClient.generateCacheKey);
           }
           return adapters;
         })(),
@@ -175,6 +188,17 @@ export default class HttpClient {
       request: safeJsonParse(requestConfig.data, requestConfig.data),
       correlationId: requestConfig.headers?.[orionCorrelationIdRoot],
     };
+  }
+
+  // implemented based on https://github.com/RasCarlito/axios-cache-adapter/blob/master/src/cache.js#L77
+  public static generateCacheKey(req: AxiosRequestConfig): string {
+    const prefix: string = req.headers?.Authorization
+      ? safeJwtCanonicalIdParse(req.headers.Authorization.replace('Bearer ', '')) ?? uuid.v4()
+      : 'shared';
+    const url = `${req.baseURL ? req.baseURL : ''}${req.url}`;
+    const query = req.params ? JSON.stringify(req.params) : ''; // possible improvement: optimize cache-hit ratio by sorting the query params
+    const key = `${prefix}/${url}${query}`;
+    return `${key}${req.data ? md5(req.data) : ''}`;
   }
 
   /**
@@ -307,9 +331,9 @@ export interface HttpClientOptions {
   enableCache?: boolean;
   /**
    * Cache options
-   * @link https://github.com/kuitos/axios-extensions#cacheadapterenhancer
+   * @link https://github.com/RasCarlito/axios-cache-adapter/blob/master/axios-cache-adapter.d.ts#L26
    */
-  cacheOptions?: CacheOptions;
+  cacheOptions?: IAxiosCacheAdapterOptions;
   /**
    * Enable automatic retries
    */
