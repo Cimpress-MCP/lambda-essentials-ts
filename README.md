@@ -61,6 +61,14 @@ let httpClient = new HttpClient({
       [500, 599],
     ],
   },
+  enableCache: true,
+  cacheOptions: {
+    maxAge: 5 * 60 * 1000,
+    readOnError: true,
+    exclude: {
+      query: false, // also cache requests with query parameters
+    },
+  },
 });
 
 let headers = {};

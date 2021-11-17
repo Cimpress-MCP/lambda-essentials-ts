@@ -1,10 +1,9 @@
 import OpenApi from 'openapi-factory';
-import jwt from 'jsonwebtoken';
 import * as uuid from 'uuid';
 import { ApiRequest } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
-import { serializeObject } from '../util';
+import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
 
@@ -37,7 +36,8 @@ export default class OpenApiWrapper {
             request.requestContext.authorizer?.jwt ?? request.headers.Authorization?.split(' ')[1];
           this.userPrincipal =
             request.requestContext.authorizer?.canonicalId ??
-            jwt.decode(this.userToken)?.[this.canonicalIdKey];
+            safeJwtCanonicalIdParse(this.userToken) ??
+            'unknown';
           this.requestId = request.requestContext.requestId;
           requestLogger.log({
             title: 'RequestLogger',
