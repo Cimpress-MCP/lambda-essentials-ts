@@ -236,5 +236,17 @@ describe('Open API Wrapper', () => {
         stack: expect.any(String),
       });
     });
+
+    test('returns application/hal+json response type in successful response headers', async () => {
+      const logger = new LoggerMock();
+      const openApi = new OpenApiWrapper(logger);
+      const statusCode = 200;
+      const response: ApiResponse = new ApiResponse(statusCode, null);
+
+      const { api } = openApi;
+      const actual = api.responseMiddleware(request, response);
+
+      expect(actual.headers['Content-type']).toEqual('application/hal+json');
+    });
   });
 });
