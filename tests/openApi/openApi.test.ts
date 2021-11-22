@@ -92,7 +92,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 500,
         headers: {
-          'Content-type': 'application/hal+json',
+          'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
@@ -119,7 +119,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 500,
         headers: {
-          'Content-type': 'application/hal+json',
+          'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
@@ -149,7 +149,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 503,
         headers: {
-          'Content-type': 'application/hal+json',
+          'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
@@ -180,7 +180,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 403,
         headers: {
-          'Content-type': 'application/hal+json',
+          'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
@@ -250,7 +250,7 @@ describe('Open API Wrapper', () => {
       const { api } = openApi;
       const actual = api.responseMiddleware(request, response);
 
-      expect(actual.headers['Content-type']).toEqual('application/hal+json');
+      expect(actual.headers['Content-Type']).toEqual('application/hal+json');
     });
   });
 });

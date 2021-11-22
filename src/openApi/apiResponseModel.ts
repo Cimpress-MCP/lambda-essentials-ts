@@ -10,7 +10,7 @@ export class ApiResponse<T = any> {
   constructor(statusCode: number, body?: T, headers?: Record<string, string>) {
     this.body = body;
     this.statusCode = statusCode;
-    this.headers = { 'Content-type': 'application/hal+json', ...headers };
+    this.headers = { 'Content-Type': 'application/hal+json', ...headers };
   }
 
   public withCorrelationId(correlationId: string) {
