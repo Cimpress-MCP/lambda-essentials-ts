@@ -92,6 +92,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 500,
         headers: {
+          'Content-type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
@@ -118,6 +119,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 500,
         headers: {
+          'Content-type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
@@ -147,6 +149,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 503,
         headers: {
+          'Content-type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
@@ -177,6 +180,7 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 403,
         headers: {
+          'Content-type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
       };
