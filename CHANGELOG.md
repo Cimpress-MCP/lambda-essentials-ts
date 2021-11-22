@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [4.1.0] - 2021-11-22
+
+### Changed
+
+- `ApiResponse` default content-type header was changed from `application/links+json` to `application/hal+json`
+
 ## [4.0.0] - 2021-11-12
 
 ### Changed
