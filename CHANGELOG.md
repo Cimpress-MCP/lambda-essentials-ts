@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [4.1.1] - 2021-11-22
+
+### Fixed
+
+- `ApiResponse` default content-type header was renamed to `Content-Type` to overwrite the default header
+  of [openapi-factory.js](https://github.com/Rhosys/openapi-factory.js/blob/release/5.2/src/response.js#L15)
+- Also upgraded `openapi-factory.js` to get support of over-writing response headers
+
 ## [4.1.0] - 2021-11-22
 
 ### Changed
