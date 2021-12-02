@@ -11,7 +11,8 @@ export class ApiResponse<T = any> {
     this.body = body;
     this.statusCode = statusCode;
     this.headers = {
-      'Access-Control-Expose-Headers': 'Location, orion-correlation-id-root',
+      'Access-Control-Expose-Headers':
+        'Location, orion-correlation-id-root, access-control-allow-origin',
       'Content-Type': 'application/hal+json',
       ...headers,
     };
