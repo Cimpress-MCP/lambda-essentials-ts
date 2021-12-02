@@ -10,7 +10,12 @@ export class ApiResponse<T = any> {
   constructor(statusCode: number, body?: T, headers?: Record<string, string>) {
     this.body = body;
     this.statusCode = statusCode;
-    this.headers = { 'Content-Type': 'application/hal+json', ...headers };
+    this.headers = {
+      'Access-Control-Expose-Headers':
+        'Location, Access-Control-Allow-Origin, orion-correlation-id-root',
+      'Content-Type': 'application/hal+json',
+      ...headers,
+    };
   }
 
   public withCorrelationId(correlationId: string) {
