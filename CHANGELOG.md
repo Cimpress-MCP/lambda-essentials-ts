@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [4.1.2] - 2021-12-02
+
+### Changed
+
+Expose the `Location`, `orion-correlation-id-root`headers
+
 ## [4.1.1] - 2021-11-22
 
 ### Fixed
