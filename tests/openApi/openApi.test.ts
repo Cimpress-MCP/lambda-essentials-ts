@@ -92,6 +92,8 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 500,
         headers: {
+          'Access-Control-Expose-Headers':
+            'Location, Access-Control-Allow-Origin, orion-correlation-id-root',
           'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
@@ -119,6 +121,8 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 500,
         headers: {
+          'Access-Control-Expose-Headers':
+            'Location, Access-Control-Allow-Origin, orion-correlation-id-root',
           'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
@@ -149,6 +153,8 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 503,
         headers: {
+          'Access-Control-Expose-Headers':
+            'Location, Access-Control-Allow-Origin, orion-correlation-id-root',
           'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
@@ -180,6 +186,8 @@ describe('Open API Wrapper', () => {
         },
         statusCode: 403,
         headers: {
+          'Access-Control-Expose-Headers':
+            'Location, Access-Control-Allow-Origin, orion-correlation-id-root',
           'Content-Type': 'application/hal+json',
           'orion-correlation-id-root': 'not-set',
         },
