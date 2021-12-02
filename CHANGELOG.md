@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 
-Expose the `Location`, `orion-correlation-id-root` and `access-control-allow-origin` headers
+Expose the `Location`, `Access-Control-Allow-Origin` and `orion-correlation-id-root` headers
 
 ## [4.1.1] - 2021-11-22
 

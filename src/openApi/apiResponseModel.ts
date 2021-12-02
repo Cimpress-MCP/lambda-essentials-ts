@@ -12,7 +12,7 @@ export class ApiResponse<T = any> {
     this.statusCode = statusCode;
     this.headers = {
       'Access-Control-Expose-Headers':
-        'Location, orion-correlation-id-root, access-control-allow-origin',
+        'Location, Access-Control-Allow-Origin, orion-correlation-id-root',
       'Content-Type': 'application/hal+json',
       ...headers,
     };
