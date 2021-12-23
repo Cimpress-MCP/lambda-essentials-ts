@@ -13,6 +13,7 @@ export interface ApiRequest<Body = any, Query = any> {
   headers: Record<string, string>;
   pathParameters: Record<string, string>;
   queryStringParameters?: Query;
+  multiValueQueryStringParameters?: Query;
 }
 
 export interface PostRequest<Body = any, Query = any> extends ApiRequest<Body, Query> {

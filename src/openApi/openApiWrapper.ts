@@ -47,6 +47,7 @@ export default class OpenApiWrapper {
             method: request.httpMethod,
             path: request.path,
             user: this.userPrincipal,
+            query: request.multiValueQueryStringParameters,
           });
           return request;
         },
