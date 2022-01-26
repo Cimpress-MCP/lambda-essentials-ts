@@ -7,14 +7,14 @@ describe('Open API Wrapper', () => {
   const LoggerMock = jest.fn();
 
   const headers = {};
-  const httpMethod = 'GET';
+  const method = 'GET';
   const path = '/path';
   const principalId = 'tests-principal-id';
   const canonicalId = 'tests-canonical-id';
   const correlationId = 'test-correlation-id';
   const request: ApiRequest<any> = {
     headers,
-    httpMethod,
+    httpMethod: method,
     path,
     pathParameters: { param: 'param' },
     requestContext: {
@@ -51,7 +51,7 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'INFO',
         title: 'RequestLogger',
-        method: httpMethod,
+        method,
         user: canonicalId,
         path,
         headers,
@@ -72,6 +72,8 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'INFO',
         title: 'ResponseLogger',
+        method,
+        path,
         statusCode,
       });
     });
@@ -107,6 +109,9 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'CRITICAL',
         title: 'ErrorLogger',
+        statusCode: 500,
+        method,
+        path,
         message,
         stack: expect.any(String),
       });
@@ -136,6 +141,8 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'ERROR',
         title: 'ErrorLogger',
+        method,
+        path,
         details: exception.details,
         statusCode: 500,
         message: 'Internal Server Error',
@@ -168,6 +175,8 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'INFO',
         title: 'ErrorLogger',
+        method,
+        path,
         details: exception.details,
         statusCode: 503,
         message: `Dependent service "${testServiceName}" returned error`,
@@ -201,6 +210,8 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'INFO',
         title: 'ErrorLogger',
+        method,
+        path,
         details: exception.details,
         statusCode: 403,
         message: 'tests-error-message',
@@ -222,6 +233,8 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'INFO',
         title: 'ResponseLogger',
+        method,
+        path,
         statusCode,
       });
     });
@@ -243,6 +256,8 @@ describe('Open API Wrapper', () => {
       expect(logger.log).toBeCalledWith({
         level: 'ERROR',
         title: 'ErrorLogger',
+        method,
+        path,
         statusCode,
         message: 'Internal Server Error',
         stack: expect.any(String),

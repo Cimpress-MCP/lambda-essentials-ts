@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [4.1.5] - 2021-01-26
+
+API ResponseLogger and ErrorLogger now log the request http method and the path
+
 ## [4.1.2] - 2021-12-02
 
 ### Changed

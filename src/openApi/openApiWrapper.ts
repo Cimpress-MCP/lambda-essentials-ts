@@ -6,6 +6,7 @@ import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
+import { SuggestedLogObject } from '../logger/logger';
 
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
@@ -56,6 +57,8 @@ export default class OpenApiWrapper {
             title: 'ResponseLogger',
             level: 'INFO',
             statusCode: response.statusCode,
+            method: request.httpMethod,
+            path: request.path,
           });
 
           const { correlationId } = this;
@@ -71,9 +74,23 @@ export default class OpenApiWrapper {
 
           if (error instanceof Exception) {
             if (error.statusCode === 500) {
-              requestLogger.log({ title: 'ErrorLogger', level: 'ERROR', ...serializedError });
+              requestLogger.log(
+                OpenApiWrapper.createResponseErrorLogObject(
+                  'ERROR',
+                  request,
+                  error.statusCode,
+                  serializedError,
+                ),
+              );
             } else {
-              requestLogger.log({ title: 'ErrorLogger', level: 'INFO', ...serializedError });
+              requestLogger.log(
+                OpenApiWrapper.createResponseErrorLogObject(
+                  'INFO',
+                  request,
+                  error.statusCode,
+                  serializedError,
+                ),
+              );
             }
 
             return new ApiResponse(error.statusCode, {
@@ -83,7 +100,9 @@ export default class OpenApiWrapper {
             }).withCorrelationId(correlationId);
           }
 
-          requestLogger.log({ title: 'ErrorLogger', level: 'CRITICAL', ...serializedError });
+          requestLogger.log(
+            OpenApiWrapper.createResponseErrorLogObject('CRITICAL', request, 500, serializedError),
+          );
 
           return new ApiResponse(500, {
             title: 'Unexpected error',
@@ -129,5 +148,21 @@ export default class OpenApiWrapper {
     const existingCorrelationId = headers[orionCorrelationIdRoot];
     this.correlationId = existingCorrelationId ?? uuid.v4();
     return this.correlationId;
+  }
+
+  private static createResponseErrorLogObject(
+    level: 'CRITICAL' | 'ERROR' | 'WARN' | 'INFO',
+    request: ApiRequest,
+    statusCode: number,
+    serializedError: object,
+  ): SuggestedLogObject {
+    return {
+      title: 'ErrorLogger',
+      level,
+      statusCode,
+      method: request.httpMethod,
+      path: request.path,
+      ...serializedError,
+    };
   }
 }
