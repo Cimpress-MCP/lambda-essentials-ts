@@ -10,6 +10,7 @@ export class ClientException extends Exception {
     401: 401,
     403: 403,
     404: 422,
+    422: 422,
   };
 
   constructor(serviceName: string, originalStatusCode?: number, details?: any) {

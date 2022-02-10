@@ -32,6 +32,10 @@ describe('ClientException', () => {
         originalStatusCode: 404,
         exceptionStatusCode: 422,
       },
+      {
+        originalStatusCode: 422,
+        exceptionStatusCode: 422,
+      },
     ];
 
     testData.map(({ exceptionStatusCode, originalStatusCode }) =>
