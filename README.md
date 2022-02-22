@@ -123,10 +123,10 @@ const tokenProvider = new SecretsManagerTokenProvider({
 });
 
 // recommended way to retrieve token (utilizes caching and takes care of token expiration)
-let accessToken = await tokenProvider.getToken();
+const accessToken = await tokenProvider.getToken();
 
-// or bypass caching and get new token
-accessToken = await tokenProvider.getTokenWithoutCache();
+// or bypass caching and get a new fresh token
+const freshAccessToken = await tokenProvider.getTokenWithoutCache();
 ```
 
 ### KmsTokenProvider
@@ -150,10 +150,10 @@ const tokenProvider = new KmsTokenProvider({
 });
 
 // recommended way to retrieve token (utilizes caching and takes care of token expiration)
-let accessToken = await tokenProvider.getToken();
+const accessToken = await tokenProvider.getToken();
 
-// or bypass caching and get new token
-accessToken = await tokenProvider.getTokenWithoutCache();
+// or bypass caching and get a new fresh token
+const freshAccessToken = await tokenProvider.getTokenWithoutCache();
 ```
 
 ### Exceptions
