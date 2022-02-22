@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.0.0] - 2022-02-22
+
+### Changed
+
+- **[Breaking change]** `TokenProvider` was replaced by more specific `KmsTokenProvider` class.
+  The functionality and interface remains the same, the imports need to be changed.
+
+### Added
+
+- New `SecretsManagerTokenProvider` that relies on AWS Secrets Manager to retrieve client ID and client secret.
+  The advantage of using AWS Secrets Manager is that it can be supplied with a secret rotation function.
+
 ## [4.1.5] - 2022-02-10
 
 ### Changed

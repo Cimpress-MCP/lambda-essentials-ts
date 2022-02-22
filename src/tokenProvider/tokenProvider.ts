@@ -1,11 +1,8 @@
 import jwtManager from 'jsonwebtoken';
-import { KMS } from 'aws-sdk';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-export default class TokenProvider {
+export default abstract class TokenProvider {
   private httpClient: TokenProviderHttpClient;
-
-  private kmsClient: KMS;
 
   private configuration: TokenConfiguration;
 
@@ -14,28 +11,18 @@ export default class TokenProvider {
   /**
    * Create a new Instance of the TokenProvider
    */
+  // eslint-disable-next-line complexity
   constructor(options: TokenProviderOptions) {
     this.httpClient = options.httpClient ?? axios.create();
 
-    if (!options.kmsClient) {
-      throw new Error('KMS Client is missing');
-    }
-    this.kmsClient = options.kmsClient;
-
-    const configuration = options.tokenConfiguration;
-    if (!configuration?.clientId) {
-      throw new Error('Configuration error: missing required property "clientId"');
-    }
-    if (!configuration?.encryptedClientSecret) {
-      throw new Error('Configuration error: missing required property "encryptedClientSecret"');
-    }
-    if (!configuration?.audience) {
+    if (!options.tokenConfiguration?.audience) {
       throw new Error('Configuration error: missing required property "audience"');
     }
-    if (!configuration?.tokenEndpoint) {
+    if (!options.tokenConfiguration?.tokenEndpoint) {
       throw new Error('Configuration error: missing required property "tokenEndpoint"');
     }
-    this.configuration = configuration;
+
+    this.configuration = options.tokenConfiguration;
   }
 
   /**
@@ -50,10 +37,10 @@ export default class TokenProvider {
     try {
       const jwtToken = await this.currentTokenPromise;
       // lower the token expiry time by 10s so that the returned token will be not immediately expired
-      if (!jwtToken || jwtManager.decode(jwtToken)?.['exp'] < Date.now() / 1000 - 10) {
+      if (!jwtToken || jwtManager.decode(jwtToken)?.exp < Date.now() / 1000 - 10) {
         this.currentTokenPromise = this.getTokenWithoutCache();
       }
-      return this.currentTokenPromise;
+      return await this.currentTokenPromise;
     } catch (error) {
       this.currentTokenPromise = this.getTokenWithoutCache();
       return this.currentTokenPromise;
@@ -64,14 +51,14 @@ export default class TokenProvider {
    * Get access token.
    */
   async getTokenWithoutCache(): Promise<string> {
-    const secret = await this.kmsClient
-      .decrypt({ CiphertextBlob: Buffer.from(this.configuration.encryptedClientSecret, 'base64') })
-      .promise()
-      .then((data) => data.Plaintext?.toString());
+    const secret = await this.getClientSecret();
+    if (!secret?.Auth0ClientID || !secret.Auth0ClientSecret) {
+      throw new Error('Request error: failed to retrieve Auth0 Client ID/Secret');
+    }
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     const body = {
-      client_id: this.configuration.clientId,
-      client_secret: secret,
+      client_id: secret.Auth0ClientID,
+      client_secret: secret.Auth0ClientSecret,
       audience: this.configuration.audience,
       grant_type: 'client_credentials',
     };
@@ -82,6 +69,13 @@ export default class TokenProvider {
     );
     return response.data.access_token;
   }
+
+  protected abstract async getClientSecret(): Promise<Auth0Secret | undefined>;
+}
+
+export interface Auth0Secret {
+  Auth0ClientID: string;
+  Auth0ClientSecret: string;
 }
 
 export interface TokenProviderOptions {
@@ -90,24 +84,12 @@ export interface TokenProviderOptions {
    */
   httpClient?: TokenProviderHttpClient;
   /**
-   * AWS KMS Client
-   */
-  kmsClient: KMS;
-  /**
    * Configuration needed for the token
    */
   tokenConfiguration: TokenConfiguration;
 }
 
 export interface TokenConfiguration {
-  /**
-   * Username or ClientId
-   */
-  clientId: string;
-  /**
-   * KMS Encrypted client secret
-   */
-  encryptedClientSecret: string;
   audience: string;
   tokenEndpoint: string;
 }

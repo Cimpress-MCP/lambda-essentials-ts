@@ -12,6 +12,14 @@ import TokenProvider, {
   TokenProviderOptions,
   TokenProviderHttpClient,
 } from './tokenProvider/tokenProvider';
+import KmsTokenProvider, {
+  KmsTokenProviderOptions,
+  KmsTokenConfiguration,
+} from './tokenProvider/kmsTokenProvider';
+import SecretsManagerTokenProvider, {
+  SecretsManagerTokenProviderOptions,
+  SecretsManagerTokenConfiguration,
+} from './tokenProvider/secretsManagerTokenProvider';
 import { ClientException } from './exceptions/clientException';
 import { ConflictException } from './exceptions/conflictException';
 import { Exception } from './exceptions/exception';
@@ -29,6 +37,8 @@ export {
   HttpClient,
   HttpLogType,
   TokenProvider,
+  KmsTokenProvider,
+  SecretsManagerTokenProvider,
   ValidationException,
   NotFoundException,
   InvalidDataException,
@@ -53,4 +63,8 @@ export type {
   TokenConfiguration,
   TokenProviderOptions,
   TokenProviderHttpClient,
+  KmsTokenProviderOptions,
+  KmsTokenConfiguration,
+  SecretsManagerTokenProviderOptions,
+  SecretsManagerTokenConfiguration,
 };
