@@ -11,17 +11,8 @@ export default abstract class TokenProvider {
   /**
    * Create a new Instance of the TokenProvider
    */
-  // eslint-disable-next-line complexity
-  constructor(options: TokenProviderOptions) {
+  protected constructor(options: TokenProviderOptions) {
     this.httpClient = options.httpClient ?? axios.create();
-
-    if (!options.tokenConfiguration?.audience) {
-      throw new Error('Configuration error: missing required property "audience"');
-    }
-    if (!options.tokenConfiguration?.tokenEndpoint) {
-      throw new Error('Configuration error: missing required property "tokenEndpoint"');
-    }
-
     this.configuration = options.tokenConfiguration;
   }
 
@@ -70,7 +61,7 @@ export default abstract class TokenProvider {
     return response.data.access_token;
   }
 
-  protected abstract async getClientSecret(): Promise<Auth0Secret | undefined>;
+  public abstract async getClientSecret(): Promise<Auth0Secret | undefined>;
 }
 
 export interface Auth0Secret {

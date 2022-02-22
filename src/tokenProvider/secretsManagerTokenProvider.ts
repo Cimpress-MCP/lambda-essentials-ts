@@ -11,24 +11,21 @@ export default class SecretsManagerTokenProvider extends TokenProvider {
   private secretsManagerConfiguration: SecretsManagerTokenConfiguration;
 
   constructor(options: SecretsManagerTokenProviderOptions) {
-    if (!options.secretsManagerClient) {
-      throw new Error('Configuration error: missing required property "secretsManagerClient"');
-    }
-    if (!options.tokenConfiguration?.clientSecretId) {
-      throw new Error('Configuration error: missing required property "clientSecretId"');
-    }
-
     super(options);
     this.secretsManagerClient = options.secretsManagerClient;
     this.secretsManagerConfiguration = options.tokenConfiguration;
   }
 
-  protected async getClientSecret(): Promise<Auth0Secret | undefined> {
+  public async getClientSecret(): Promise<Auth0Secret | undefined> {
     const secret = await this.secretsManagerClient
       .getSecretValue({ SecretId: this.secretsManagerConfiguration.clientSecretId })
       .promise();
 
-    return JSON.parse(secret.SecretString!) as Auth0Secret;
+    if (!secret?.SecretString) {
+      throw new Error('Request error: failed to retrieve secret from Secrets Manager');
+    }
+
+    return JSON.parse(secret.SecretString) as Auth0Secret;
   }
 }
 
