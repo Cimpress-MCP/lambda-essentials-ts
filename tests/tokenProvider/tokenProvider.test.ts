@@ -1,10 +1,9 @@
-import {
+import TokenProvider, {
+  Auth0Secret,
   TokenConfiguration,
-  TokenProvider,
   TokenProviderHttpClient,
   TokenProviderOptions,
-} from '../../src';
-import { Auth0Secret } from '../../src/tokenProvider/tokenProvider';
+} from '../../src/tokenProvider/tokenProvider';
 
 class TestTokenProvider extends TokenProvider {
   private readonly getClientSecretResponse?: Auth0Secret;
