@@ -88,15 +88,55 @@ let axiosClient = axios.create({ timeout: 3000 });
 new HttpClient({ client: axiosClient });
 ```
 
-### TokenProvider
+### SecretsManagerTokenProvider
+
+It uses AWS Secrets Manager to retrieve the client ID and secret and then calls the specified token endpoint the retrieve JWT.
+
+CloudFormation to create a secret. Also allow the lambda function to access the secret by attaching `AWSSecretsManagerGetSecretValuePolicy` IAM Policy.
+
+```yaml
+Auth0Secret:
+  Type: AWS::SecretsManager::Secret
+  Properties:
+    Description: 'Auth0 Client ID/Secret'
+    GenerateSecretString:
+      SecretStringTemplate: '{"Auth0ClientID": "client_id", "Auth0ClientSecret": "client_secret"}'
+      GenerateStringKey: 'Auth0ClientSecret'
+```
+
+```typescript
+import {
+  SecretsManagerTokenProvider,
+  SecretsManagerTokenConfiguration,
+} from 'lambda-essentials-ts';
+
+const configuration: SecretsManagerTokenConfiguration = {
+  clientSecretId: 'arn:aws:secretsmanager:eu-west-1:<aws_account_id>:secret:<secret_id>',
+  audience: 'https://example.com/',
+  tokenEndpoint: 'https://example.com/oauth/token',
+};
+
+const secretsManagerClient = new aws.SecretsManager({ region: 'eu-west-1' });
+const tokenProvider = new SecretsManagerTokenProvider({
+  secretsManagerClient: secretsManagerClient,
+  tokenConfiguration: configuration,
+});
+
+// recommended way to retrieve token (utilizes caching and takes care of token expiration)
+const accessToken = await tokenProvider.getToken();
+
+// or bypass caching and get a new fresh token
+const freshAccessToken = await tokenProvider.getTokenWithoutCache();
+```
+
+### KmsTokenProvider
 
 It uses AWS KMS to decrypt the client secret and then calls the specified token endpoint the retrieve JWT.
 
 ```typescript
-import axios from 'axios';
-import { TokenProvider, TokenConfiguration } from 'lambda-essentials-ts';
+import { KmsTokenProvider, KmsTokenConfiguration } from 'lambda-essentials-ts';
 
-const configuration: TokenConfiguration = {
+const configuration: KmsTokenConfiguration = {
   clientId: 'CLIENT_ID',
   encryptedClientSecret: 'BASE64_KMS_ENCRYPTED_CLIENT_SECRET',
   audience: 'https://example.com/',
@@ -104,17 +144,16 @@ const configuration: TokenConfiguration = {
 };
 
 const kmsClient = new aws.KMS({ region: 'eu-west-1' });
-const tokenProvider = new TokenProvider({
-  httpClient: axios.create(),
+const tokenProvider = new KmsTokenProvider({
   kmsClient: kmsClient,
   tokenConfiguration: configuration,
 });
 
 // recommended way to retrieve token (utilizes caching and takes care of token expiration)
-let accessToken = await tokenProvider.getToken();
+const accessToken = await tokenProvider.getToken();
 
-// or bypass caching and get new token
-accessToken = await tokenProvider.getTokenWithoutCache();
+// or bypass caching and get a new fresh token
+const freshAccessToken = await tokenProvider.getTokenWithoutCache();
 ```
 
 ### Exceptions

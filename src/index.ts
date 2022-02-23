@@ -7,11 +7,15 @@ import Logger, { LoggerConfiguration, SuggestedLogObject } from './logger/logger
 import OpenApiWrapper from './openApi/openApiWrapper';
 import { ApiResponse } from './openApi/apiResponseModel';
 import { ApiRequest, GetRequest, PostRequest, PutRequest } from './openApi/apiRequestModel';
-import TokenProvider, {
-  TokenConfiguration,
-  TokenProviderOptions,
-  TokenProviderHttpClient,
-} from './tokenProvider/tokenProvider';
+import { TokenProviderHttpClient } from './tokenProvider/tokenProvider';
+import KmsTokenProvider, {
+  KmsTokenProviderOptions,
+  KmsTokenConfiguration,
+} from './tokenProvider/kmsTokenProvider';
+import SecretsManagerTokenProvider, {
+  SecretsManagerTokenProviderOptions,
+  SecretsManagerTokenConfiguration,
+} from './tokenProvider/secretsManagerTokenProvider';
 import { ClientException } from './exceptions/clientException';
 import { ConflictException } from './exceptions/conflictException';
 import { Exception } from './exceptions/exception';
@@ -28,7 +32,8 @@ export {
   ApiResponse,
   HttpClient,
   HttpLogType,
-  TokenProvider,
+  KmsTokenProvider,
+  SecretsManagerTokenProvider,
   ValidationException,
   NotFoundException,
   InvalidDataException,
@@ -50,7 +55,9 @@ export type {
   GetRequest,
   PostRequest,
   PutRequest,
-  TokenConfiguration,
-  TokenProviderOptions,
   TokenProviderHttpClient,
+  KmsTokenProviderOptions,
+  KmsTokenConfiguration,
+  SecretsManagerTokenProviderOptions,
+  SecretsManagerTokenConfiguration,
 };
