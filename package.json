@@ -26,28 +26,28 @@
   },
   "homepage": "https://github.com/Cimpress-MCP/lambda-essentials-ts#readme",
   "dependencies": {
-    "aws-sdk": "2.1078.0",
-    "axios": "0.21.1",
-    "axios-cache-adapter": "2.7.3",
-    "fast-safe-stringify": "2.0.7",
-    "is-error": "2.2.2",
-    "jsonwebtoken": "8.5.1",
-    "md5": "2.3.0",
+    "aws-sdk": "^2.1078.0",
+    "axios": "~0.21.3",
+    "axios-cache-adapter": "~2.7.3",
+    "fast-safe-stringify": "~2.0.7",
+    "is-error": "~2.2.2",
+    "jsonwebtoken": "~8.5.1",
+    "md5": "~2.3.0",
     "openapi-factory": "5.2.17",
-    "retry-axios": "2.6.0",
-    "uuid": "8.3.2"
+    "retry-axios": "~2.6.0",
+    "uuid": "~8.3.2"
   },
   "devDependencies": {
-    "@types/jest": "26.0.20",
-    "eslint": "7.18.0",
-    "eslint-config-cimpress-atsquad": "2.1.2",
-    "husky": "4.2.5",
-    "jest": "26.2.2",
-    "lint-staged": "10.2.13",
-    "prettier": "2.0.5",
-    "ts-jest": "26.1.4",
-    "ts-node": "8.10.2",
-    "typescript": "3.9.7"
+    "@types/jest": "^26.0.20",
+    "eslint": "^7.18.0",
+    "eslint-config-cimpress-atsquad": "^2.1.2",
+    "husky": "^4.2.5",
+    "jest": "^26.2.2",
+    "lint-staged": "^10.2.13",
+    "prettier": "^2.7.1",
+    "ts-jest": "^26.1.4",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   },
   "eslintConfig": {
     "extends": "cimpress-atsquad"
