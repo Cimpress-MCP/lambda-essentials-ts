@@ -45,6 +45,7 @@ export default class HttpClient {
   /**
    * Create a new Instance of the HttpClient
    */
+  // eslint-disable-next-line complexity
   constructor(options?: HttpClientOptions) {
     // eslint-disable-next-line no-console
     this.logFunction = options?.logFunction ?? console.log;
