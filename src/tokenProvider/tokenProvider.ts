@@ -61,7 +61,7 @@ export default abstract class TokenProvider {
     return response.data.access_token;
   }
 
-  public abstract async getClientSecret(): Promise<Auth0Secret | undefined>;
+  public abstract getClientSecret(): Promise<Auth0Secret | undefined>;
 }
 
 export interface Auth0Secret {
