@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.0] - 2022-09-05
+
+### Changed
+
+Dependencies aren't pinned to a fixed version to allow users of the library to independently upgrade minor (devDependencies) and patch (dependencies) versions. This will simplify fixing security alerts faster than in this library, for example by applying `npm audit fix`.
+
 ## [5.0.0] - 2022-02-22
 
 ### Changed
