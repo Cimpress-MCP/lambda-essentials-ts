@@ -25,6 +25,7 @@ export default class OpenApiWrapper {
   private correlationId: string = this.notSet;
 
   constructor(requestLogger) {
+    // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {
         requestMiddleware: (request: ApiRequest): ApiRequest => {
