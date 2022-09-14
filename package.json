@@ -1,6 +1,6 @@
 {
   "name": "lambda-essentials-ts",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "A selection of the finest modules supporting authorization, API routing, error handling, logging and sending HTTP requests.",
   "main": "lib/index.js",
   "private": false,
