@@ -2,6 +2,8 @@ export interface ApiRequest<Body = any, Query = any> {
   body?: Body;
   path: string;
   httpMethod: string;
+  route: string;
+  isBase64Encoded: Boolean;
   requestContext: {
     authorizer?: {
       jwt: string;
@@ -12,6 +14,7 @@ export interface ApiRequest<Body = any, Query = any> {
   };
   headers: Record<string, string>;
   pathParameters: Record<string, string>;
+  stageVariables: Record<string, string>;
   queryStringParameters?: Query;
   multiValueQueryStringParameters?: any;
 }

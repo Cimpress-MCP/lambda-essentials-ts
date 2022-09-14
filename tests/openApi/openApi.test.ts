@@ -25,6 +25,11 @@ describe('Open API Wrapper', () => {
       },
       requestId: 'tests-request-id',
     },
+    stageVariables: {
+      unit: 'test',
+    },
+    isBase64Encoded: false,
+    route: path,
   };
   const requestWithCorrelationHeader: ApiRequest<any> = {
     ...request,
