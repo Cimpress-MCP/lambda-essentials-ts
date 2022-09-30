@@ -44,7 +44,7 @@ export default class OpenApiWrapper {
             title: 'RequestLogger',
             level: 'INFO',
             body: request.body,
-            headers: request.headers, // TODO: filter out unnecessary properties
+            headers: {},
             method: request.httpMethod,
             path: request.path,
             user: this.userPrincipal,
