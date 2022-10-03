@@ -44,7 +44,12 @@ export default class OpenApiWrapper {
             title: 'RequestLogger',
             level: 'INFO',
             body: request.body,
-            headers: request.headers, // TODO: filter out unnecessary properties
+            headers: {
+              Host: request.headers.Host,
+              'User-Agent': request.headers['User-Agent'],
+              'orion-correlation-id-parent': request.headers['orion-correlation-id-parent'],
+              'orion-correlation-id-root': request.headers['orion-correlation-id-root'],
+            },
             method: request.httpMethod,
             path: request.path,
             user: this.userPrincipal,

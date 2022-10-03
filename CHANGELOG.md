@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.3] - 2022-10-03
+
+### Changed
+
+RequestLogger now logs only `Host`, 'User-Agent`, `orion-correlation-id-parent`, `orion-correlation-id-root` headers.
+
 ## [5.1.2] - 2022-09-14
 
 ### Changed
