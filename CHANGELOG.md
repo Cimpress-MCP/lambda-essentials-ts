@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 
-Headers are reduced to bringdown the size of the logs sent to sumologic.
+RequestLogger now logs only `Host`, 'User-Agent`, `orion-correlation-id-parent`, `orion-correlation-id-root` headers.
 
 ## [5.1.2] - 2022-09-14
 
