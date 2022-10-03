@@ -5,8 +5,11 @@ import { ApiResponse } from '../../src/openApi/apiResponseModel';
 
 describe('Open API Wrapper', () => {
   const LoggerMock = jest.fn();
-
-  const headers = {};
+  const headers = {
+    Host: 'test-host',
+    'User-Agent': 'test-Agent',
+    'orion-correlation-id-parent': 'test-parent',
+  };
   const httpMethod = 'GET';
   const path = '/path';
   const principalId = 'tests-principal-id';
