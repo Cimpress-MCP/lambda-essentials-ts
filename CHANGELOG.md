@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.3] - 2022-10-03
+
+### Changed
+
+Headers are reduced to bringdown the size of the logs sent to sumologic.
+
 ## [5.1.2] - 2022-09-14
 
 ### Changed
