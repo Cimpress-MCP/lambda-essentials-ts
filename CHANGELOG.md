@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.4] - 2022-11-08
+
+### Changed
+
+Using `baseURL` in the axios config without specifying the full URL resulted in an error in the exception handling. So the `AxiosError` was thrown instead of a customer `ClientException`.
+
 ## [5.1.3] - 2022-10-03
 
 ### Changed
