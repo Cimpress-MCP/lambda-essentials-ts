@@ -121,7 +121,9 @@ export default class HttpClient {
           error: serializedAxiosError,
         });
 
-        const hostname = error.config?.url ? new URL(error.config.url).hostname : 'N/A';
+        const hostname = error.config?.url
+          ? new URL(error.config.url, error.config.baseURL).hostname
+          : 'N/A';
         throw new ClientException(
           hostname,
           serializedAxiosError?.status,
