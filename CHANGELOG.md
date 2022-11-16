@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.5] - 2022-11-15
+
+### Changed
+
+The fix described in 5.1.4 missed one instance where the bug can occur. This change covers all known instances.
+
 ## [5.1.4] - 2022-11-08
 
 ### Changed
