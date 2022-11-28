@@ -63,9 +63,17 @@ export default class Logger {
         (m, p1) => `${p1}.<sig>`,
       );
     };
+    
+    const truncateSecret = (data: string): string => {
+      return data.replace(
+        /,?"client_secret":"[a-zA-Z0-9_+=.@/-]{60,}"/gi, // so far I only saw secrets with 64 characters
+        '',
+      );
+    };
 
     const replacer = (key, value) => (isError(value) ? Logger.errorToObject(value) : value);
     let stringifiedPayload = truncateToken(stringify(payload, replacer, this.jsonSpace));
+    stringifiedPayload = truncateSecret(stringifiedPayload);
     // https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html 256KB => 32768 characters
     if (stringifiedPayload.length >= 32768) {
       const replacementPayload = {
