@@ -66,8 +66,8 @@ export default class Logger {
 
     const truncateSecret = (data: string): string => {
       return data.replace(
-        /"client_secret":"[a-zA-Z0-9_+=.@/-]{60,}"/gi, // so far I only saw secrets with 64 characters
-        '"client_secret":"REDACTED"',
+        /\\*"client_secret\\*":\\*"[a-zA-Z0-9_+=.@/-]{60,}\\*"/gi,
+        '\\"client_secret\\":\\"REDACTED\\"',
       );
     };
 
