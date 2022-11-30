@@ -4,7 +4,7 @@ describe('log message', () => {
   const logFunction = jest.fn();
   const testLogger = new Logger({ logFunction });
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.resetAllMocks();
   });
 
   test('test redacting secret', () => {
