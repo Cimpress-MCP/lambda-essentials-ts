@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.6] - 2022-11-23
+
+### Changed
+
+Removed logging of client_secret
+
 ## [5.1.5] - 2022-11-15
 
 ### Changed
