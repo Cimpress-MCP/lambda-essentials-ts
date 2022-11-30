@@ -66,8 +66,8 @@ export default class Logger {
 
     const truncateSecret = (data: string): string => {
       return data.replace(
-        /\\*"client_secret\\*":\\*"[a-zA-Z0-9_+=.@/-]{60,}\\*"/gi,
-        '\\"client_secret\\":\\"REDACTED\\"',
+        /(\\*"client_secret\\*":\\*")([a-zA-Z0-9_+=.@/-]{60,})(\\*")/gi,
+        (m, p1, p2, p3) => `${p1}<REDACTED>${p3}`,
       );
     };
 
