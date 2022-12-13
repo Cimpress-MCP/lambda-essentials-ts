@@ -56,7 +56,7 @@ export default class HttpClient {
     this.correlationIdResolverFunction = options?.correlationIdResolver;
     this.enableCache = options?.enableCache ?? false;
     this.enableRetry = options?.enableRetry ?? false;
-    this.timeout = options?.timeout ?? 0;
+    this.timeout = options?.timeout;
     this.client =
       options?.client ??
       axios.create({
@@ -98,6 +98,10 @@ export default class HttpClient {
       };
       // attach retry-axios
       rax.attach(this.client);
+    }
+
+    if (this.timeout) {
+      this.client.defaults.timeout = this.timeout;
     }
 
     if (this.timeout) {
@@ -355,8 +359,9 @@ export interface HttpClientOptions {
    * @link https://github.com/JustinBeckwith/retry-axios/blob/v2.6.0/src/index.ts#L11
    */
   retryOptions?: RetryConfig;
-    /**
-   * Timeout option
+  /**
+   * Number of milliseconds before the request times out. Default or `0` is no time out.
+   * @link https://github.com/axios/axios/blob/main/README.md#request-config
    */
   timeout?: number;
 }

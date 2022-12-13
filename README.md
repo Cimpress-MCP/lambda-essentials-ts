@@ -69,6 +69,7 @@ let httpClient = new HttpClient({
       query: false, // also cache requests with query parameters
     },
   },
+  timeout: 1000
 });
 
 let headers = {};
