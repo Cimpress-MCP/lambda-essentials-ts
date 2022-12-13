@@ -42,6 +42,8 @@ export default class HttpClient {
 
   private readonly enableCache: boolean;
 
+  private readonly timeout?: number;
+  
   /**
    * Create a new Instance of the HttpClient
    */
@@ -54,6 +56,7 @@ export default class HttpClient {
     this.correlationIdResolverFunction = options?.correlationIdResolver;
     this.enableCache = options?.enableCache ?? false;
     this.enableRetry = options?.enableRetry ?? false;
+    this.timeout = options?.timeout ?? 0;
     this.client =
       options?.client ??
       axios.create({
@@ -97,6 +100,10 @@ export default class HttpClient {
       rax.attach(this.client);
     }
 
+    if (this.timeout) {
+      this.client.defaults.timeout = this.timeout;
+    }
+    
     this.client.interceptors.request.use(
       (config) => {
         if (this.logOptions.enabledLogs.includes(HttpLogType.requests)) {
@@ -348,6 +355,10 @@ export interface HttpClientOptions {
    * @link https://github.com/JustinBeckwith/retry-axios/blob/v2.6.0/src/index.ts#L11
    */
   retryOptions?: RetryConfig;
+    /**
+   * Timeout option
+   */
+  timeout?: number;
 }
 
 /**
