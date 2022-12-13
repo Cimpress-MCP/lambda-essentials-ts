@@ -103,10 +103,6 @@ export default class HttpClient {
     if (this.timeout) {
       this.client.defaults.timeout = this.timeout;
     }
-
-    if (this.timeout) {
-      this.client.defaults.timeout = this.timeout;
-    }
     
     this.client.interceptors.request.use(
       (config) => {
