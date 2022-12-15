@@ -4,6 +4,13 @@ import * as uuid from 'uuid';
 import stringify from 'fast-safe-stringify';
 import isError from 'is-error';
 
+export const redactSecret = (data: any): any => {
+  return data.replace(
+    /(\\*"client_secret\\*":\\*")([a-zA-Z0-9_+=.@/-]{60,})(\\*")/gi,
+    (m, p1, p2, p3) => `${p1}<REDACTED>${p3}`,
+  );
+};
+
 export default class Logger {
   public invocationId: string;
 
@@ -64,16 +71,9 @@ export default class Logger {
       );
     };
 
-    const truncateSecret = (data: string): string => {
-      return data.replace(
-        /(\\*"client_secret\\*":\\*")([a-zA-Z0-9_+=.@/-]{60,})(\\*")/gi,
-        (m, p1, p2, p3) => `${p1}<REDACTED>${p3}`,
-      );
-    };
-
     const replacer = (key, value) => (isError(value) ? Logger.errorToObject(value) : value);
     let stringifiedPayload = truncateToken(stringify(payload, replacer, this.jsonSpace));
-    stringifiedPayload = truncateSecret(stringifiedPayload);
+    stringifiedPayload = redactSecret(stringifiedPayload);
     // https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html 256KB => 32768 characters
     if (stringifiedPayload.length >= 32768) {
       const replacementPayload = {
