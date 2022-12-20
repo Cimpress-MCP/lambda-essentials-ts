@@ -25,7 +25,7 @@ export const redactSecret = (data: string): string => {
 };
 
 export function serializeObject(obj: unknown, redact?: boolean): object {
-  const modObj = !redact ? obj : JSON.parse(redactSecret(JSON.stringify(obj)));
+  const modObj = redact ? JSON.parse(redactSecret(JSON.stringify(obj))) : obj;
   if (modObj && typeof modObj === 'object') {
     return Object.getOwnPropertyNames(modObj).reduce((map, key) => {
       // eslint-disable-next-line no-param-reassign
@@ -34,7 +34,7 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
     }, {});
   }
 
-  return !redact ? JSON.parse(JSON.stringify(modObj)) : modObj;
+  return redact ? modObj : JSON.parse(JSON.stringify(modObj));
 }
 
 export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
