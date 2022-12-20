@@ -3,13 +3,7 @@
 import * as uuid from 'uuid';
 import stringify from 'fast-safe-stringify';
 import isError from 'is-error';
-
-export const redactSecret = (data: any): any => {
-  return data.replace(
-    /(\\*"client_secret\\*":\\*")([a-zA-Z0-9_+=.@/-]{60,})(\\*")/gi,
-    (m, p1, p2, p3) => `${p1}<REDACTED>${p3}`,
-  );
-};
+import { redactSecret } from '../util';
 
 export default class Logger {
   public invocationId: string;

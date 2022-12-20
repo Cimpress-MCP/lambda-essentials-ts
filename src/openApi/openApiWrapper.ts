@@ -6,7 +6,6 @@ import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
-import { redactSecret } from '../logger/logger';
 
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
@@ -74,7 +73,7 @@ export default class OpenApiWrapper {
         errorMiddleware: (request: ApiRequest, error: Exception | Error): ApiResponse => {
           const { correlationId } = this;
           this.clearContext();
-          const serializedError = serializeObject(this.redactObjectsSecret(error));
+          const serializedError = serializeObject(error, true);
 
           if (error instanceof Exception) {
             if (error.statusCode === 500) {
@@ -136,13 +135,5 @@ export default class OpenApiWrapper {
     const existingCorrelationId = headers[orionCorrelationIdRoot];
     this.correlationId = existingCorrelationId ?? uuid.v4();
     return this.correlationId;
-  }
-
-  private redactObjectsSecret(obj: any) {
-    const err = obj;
-    if (err.config?.data !== undefined) {
-      err.config.data = redactSecret(err.config.data);
-    }
-    return err;
   }
 }

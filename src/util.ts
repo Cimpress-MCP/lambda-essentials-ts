@@ -17,16 +17,24 @@ export function safeJsonParse(input: any, defaultValue: unknown): unknown {
   }
 }
 
-export function serializeObject(obj: unknown): object {
-  if (obj && typeof obj === 'object') {
-    return Object.getOwnPropertyNames(obj).reduce((map, key) => {
+export const redactSecret = (data: string): string => {
+  return data.replace(
+    /(\\*"*'*client_secret\\*"*'*:\s*\\*"*'*)([^"'\\]{60,})(\\*"*'*)/gi,
+    (m, p1, p2, p3) => `${p1}<REDACTED>${p3}`,
+  );
+};
+
+export function serializeObject(obj: unknown, redact?: boolean): object {
+  const modObj = !redact ? obj : JSON.parse(redactSecret(JSON.stringify(obj)));
+  if (modObj && typeof modObj === 'object') {
+    return Object.getOwnPropertyNames(modObj).reduce((map, key) => {
       // eslint-disable-next-line no-param-reassign
-      map[key] = obj[key];
+      map[key] = modObj[key];
       return map;
     }, {});
   }
 
-  return JSON.parse(JSON.stringify(obj));
+  return JSON.parse(JSON.stringify(modObj));
 }
 
 export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
