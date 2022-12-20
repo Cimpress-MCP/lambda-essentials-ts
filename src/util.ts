@@ -19,7 +19,7 @@ export function safeJsonParse(input: any, defaultValue: unknown): unknown {
 
 export const redactSecret = (data: string): string => {
   return data.replace(
-    /(\\*"*'*client_secret\\*"*'*:\s*\\*"*'*)([^"'\\]{60,})(\\*"*'*)/gi,
+    /(\\*"*'*client_secret\\*"*'*:\s*\\*"*'*)([^"'\\]+)(\\*"*'*)/gi,
     (m, p1, p2, p3) => `${p1}<REDACTED>${p3}`,
   );
 };
@@ -34,7 +34,7 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
     }, {});
   }
 
-  return JSON.parse(JSON.stringify(modObj));
+  return !redact ? JSON.parse(JSON.stringify(modObj)) : modObj;
 }
 
 export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
