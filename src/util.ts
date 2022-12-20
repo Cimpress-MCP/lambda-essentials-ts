@@ -25,16 +25,18 @@ export const redactSecret = (data: string): string => {
 };
 
 export function serializeObject(obj: unknown, redact?: boolean): object {
-  const modObj = redact ? JSON.parse(redactSecret(JSON.stringify(obj))) : obj;
-  if (modObj && typeof modObj === 'object') {
-    return Object.getOwnPropertyNames(modObj).reduce((map, key) => {
+  let modObj = obj;
+  if (obj && typeof obj === 'object') {
+    modObj = Object.getOwnPropertyNames(obj).reduce((map, key) => {
       // eslint-disable-next-line no-param-reassign
-      map[key] = modObj[key];
+      map[key] = obj[key];
       return map;
     }, {});
   }
 
-  return JSON.parse(JSON.stringify(modObj));
+  return redact
+    ? JSON.parse(redactSecret(JSON.stringify(modObj)))
+    : JSON.parse(JSON.stringify(modObj));
 }
 
 export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
