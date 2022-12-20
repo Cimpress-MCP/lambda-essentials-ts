@@ -34,7 +34,7 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
     }, {});
   }
 
-  return redact ? modObj : JSON.parse(JSON.stringify(modObj));
+  return JSON.parse(JSON.stringify(modObj));
 }
 
 export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
