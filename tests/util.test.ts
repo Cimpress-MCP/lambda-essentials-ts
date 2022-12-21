@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { serializeAxiosError, serializeObject } from '../src';
-import { safeJsonParse, safeJwtCanonicalIdParse } from '../src/util';
+import { safeJsonParse, safeJwtCanonicalIdParse, redactSecret } from '../src/util';
 
 describe('Util', () => {
   const message = 'tests-error-message';
@@ -104,6 +104,29 @@ describe('Util', () => {
       };
       const serializedError = serializeAxiosError(axiosError);
       expect(serializedError).toEqual(expected);
+    });
+  });
+
+  describe('redactSecret', () => {
+    test('secret without quotes', () => {
+      const testString =
+        'client_secret: ".ByCBCWBrfDZBYBdCnI5DDkC4BEDpDGB1YBNCsDeBNCyDypLBCBbBhDWBcDTCcDU"';
+      const expected = 'client_secret: "<REDACTED>"';
+      expect(redactSecret(testString)).toEqual(expected);
+    });
+
+    test('secret with quotes', () => {
+      const testString =
+        '"client_secret": ".ByCBCWBrfDZBYBdCnI5DDkC4BEDpDGB1YBNCsDeBNCyDypLBCBbBhDWBcDTCcDU"';
+      const expected = '"client_secret": "<REDACTED>"';
+      expect(redactSecret(testString)).toEqual(expected);
+    });
+
+    test('secret without space after colon', () => {
+      const testString =
+        '"client_secret":".ByCBCWBrfDZBYBdCnI5DDkC4BEDpDGB1YBNCsDeBNCyDypLBCBbBhDWBcDTCcDU"';
+      const expected = '"client_secret":"<REDACTED>"';
+      expect(redactSecret(testString)).toEqual(expected);
     });
   });
 });

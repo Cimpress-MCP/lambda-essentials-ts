@@ -73,7 +73,7 @@ export default class OpenApiWrapper {
         errorMiddleware: (request: ApiRequest, error: Exception | Error): ApiResponse => {
           const { correlationId } = this;
           this.clearContext();
-          const serializedError = serializeObject(error);
+          const serializedError = serializeObject(error, true);
 
           if (error instanceof Exception) {
             if (error.statusCode === 500) {
