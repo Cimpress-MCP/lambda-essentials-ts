@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.9] - 2023-01-04
+
+### Changed
+
+Upgraded jsonwebtoken version to 9.0.0 and aws-sdk to version 2.1287.0
+
 ## [5.1.8] - 2022-12-15
 
 ### Changed
