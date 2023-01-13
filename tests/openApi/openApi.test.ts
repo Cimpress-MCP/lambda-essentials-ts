@@ -185,7 +185,7 @@ describe('Open API Wrapper', () => {
       });
     });
 
-    test('returns correct status code and logs INFO when other than internal exception is caught', async () => {
+    test('returns correct status code and logs WARN when other than internal exception is caught', async () => {
       const exception = new ForbiddenException(message);
       const expected: Partial<ApiResponse> = {
         body: {
@@ -207,7 +207,7 @@ describe('Open API Wrapper', () => {
 
       expect(response).toEqual(expected);
       expect(logger.log).toBeCalledWith({
-        level: 'INFO',
+        level: 'WARN',
         title: 'ErrorLogger',
         details: exception.details,
         statusCode: 403,
