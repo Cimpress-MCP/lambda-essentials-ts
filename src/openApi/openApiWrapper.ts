@@ -78,6 +78,8 @@ export default class OpenApiWrapper {
           if (error instanceof Exception) {
             if (error.statusCode === 500) {
               requestLogger.log({ title: 'ErrorLogger', level: 'ERROR', ...serializedError });
+            } else if (error.statusCode >= 400 && error.statusCode < 500) {
+              requestLogger.log({ title: 'ErrorLogger', level: 'WARN', ...serializedError });
             } else {
               requestLogger.log({ title: 'ErrorLogger', level: 'INFO', ...serializedError });
             }

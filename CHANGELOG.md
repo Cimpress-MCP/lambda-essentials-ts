@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.1.10] - 2023-01-13
+
+### Changed
+
+The error middleware logs `4xx` errors with log level `WARN` (previously `INFO`).
+
 ## [5.1.9] - 2023-01-04
 
 ### Changed
