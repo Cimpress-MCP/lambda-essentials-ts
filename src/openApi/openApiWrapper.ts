@@ -6,13 +6,12 @@ import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
+import newrelic from 'newrelic';
 
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
 
   private readonly cleared = 'cleared';
-
-  private readonly canonicalIdKey = 'https://claims.cimpress.io/canonical_id';
 
   public api: OpenApiModel;
 
@@ -55,6 +54,12 @@ export default class OpenApiWrapper {
             user: this.userPrincipal,
             query: request.multiValueQueryStringParameters,
           });
+
+          newrelic.addCustomAttributes({
+            canonicalId: this.userPrincipal,
+            correlationId,
+          });
+
           return request;
         },
         responseMiddleware: (request: ApiRequest, response: ApiResponse): ApiResponse => {

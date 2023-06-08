@@ -1,4 +1,11 @@
-import { ApiRequest, GetRequest, PatchRequest, PostRequest, PutRequest } from './apiRequestModel';
+import {
+  ApiRequest,
+  DeleteRequest,
+  GetRequest,
+  PatchRequest,
+  PostRequest,
+  PutRequest,
+} from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 
@@ -7,8 +14,7 @@ export interface OpenApiModel {
   post: ApiControllerRoute<PostRequest>;
   put: ApiControllerRoute<PutRequest>;
   patch: ApiControllerRoute<PatchRequest>;
-
-  delete: ApiControllerRoute;
+  delete: ApiControllerRoute<DeleteRequest>;
   head: ApiControllerRoute;
   options: ApiControllerRoute;
   any: ApiControllerRoute;

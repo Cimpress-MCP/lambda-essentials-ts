@@ -6,7 +6,13 @@ import HttpClient, {
 import Logger, { LoggerConfiguration, SuggestedLogObject } from './logger/logger';
 import OpenApiWrapper from './openApi/openApiWrapper';
 import { ApiResponse } from './openApi/apiResponseModel';
-import { ApiRequest, GetRequest, PostRequest, PutRequest } from './openApi/apiRequestModel';
+import {
+  ApiRequest,
+  DeleteRequest,
+  GetRequest,
+  PostRequest,
+  PutRequest,
+} from './openApi/apiRequestModel';
 import { TokenProviderHttpClient } from './tokenProvider/tokenProvider';
 import KmsTokenProvider, {
   KmsTokenProviderOptions,
@@ -55,6 +61,7 @@ export type {
   GetRequest,
   PostRequest,
   PutRequest,
+  DeleteRequest,
   TokenProviderHttpClient,
   KmsTokenProviderOptions,
   KmsTokenConfiguration,
