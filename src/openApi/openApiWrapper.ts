@@ -68,7 +68,10 @@ export default class OpenApiWrapper {
 
           return request;
         },
-        responseMiddleware: (request: ApiRequest, response: ApiResponse): ApiResponse => {
+        responseMiddleware: async (
+          request: ApiRequest,
+          response: ApiResponse,
+        ): Promise<ApiResponse> => {
           requestLogger.log({
             title: 'ResponseLogger',
             level: 'INFO',
@@ -81,7 +84,10 @@ export default class OpenApiWrapper {
           return response.withCorrelationId(correlationId);
         },
 
-        errorMiddleware: (request: ApiRequest, error: Exception | Error): ApiResponse => {
+        errorMiddleware: async (
+          request: ApiRequest,
+          error: Exception | Error,
+        ): Promise<ApiResponse> => {
           const { correlationId } = this;
           this.clearContext();
           const serializedError = serializeObject(error, true);
