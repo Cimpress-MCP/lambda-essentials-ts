@@ -6,7 +6,11 @@ import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
-import newrelic from 'newrelic';
+import Logger from '../logger/logger';
+
+export interface OpenApiWrapperConfig {
+  enableNewRelicTracking: boolean;
+}
 
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
@@ -23,7 +27,7 @@ export default class OpenApiWrapper {
 
   private correlationId: string = this.notSet;
 
-  constructor(requestLogger) {
+  constructor(requestLogger: Logger, config: OpenApiWrapperConfig) {
     // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {
@@ -55,10 +59,14 @@ export default class OpenApiWrapper {
             query: request.multiValueQueryStringParameters,
           });
 
-          newrelic.addCustomAttributes({
-            canonicalId: this.userPrincipal,
-            correlationId,
-          });
+          if (config.enableNewRelicTracking) {
+            import('newrelic').then((newrelic) => {
+              newrelic.addCustomAttributes({
+                canonicalId: this.userPrincipal,
+                correlationId,
+              });
+            });
+          }
 
           return request;
         },

@@ -33,7 +33,6 @@
     "is-error": "~2.2.2",
     "jsonwebtoken": "9.0.0",
     "md5": "~2.3.0",
-    "newrelic": "^10.2.0",
     "openapi-factory": "5.2.38",
     "retry-axios": "~2.6.0",
     "uuid": "~8.3.2"
@@ -75,5 +74,8 @@
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "peerDependencies": {
+    "newrelic": "^10.2.0"
   }
 }
