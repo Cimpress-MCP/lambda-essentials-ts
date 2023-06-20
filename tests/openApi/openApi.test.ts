@@ -53,7 +53,7 @@ describe('Open API Wrapper', () => {
     test('returns request and logs request details', async () => {
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
-      const response = openApi.api.requestMiddleware(request);
+      const response = await openApi.api.requestMiddleware(request);
 
       expect(response).toEqual(request);
       expect(logger.log).toBeCalledWith({
@@ -74,7 +74,7 @@ describe('Open API Wrapper', () => {
       const statusCode = 200;
       const response = new ApiResponse(statusCode, null);
 
-      const actual = openApi.api.responseMiddleware(request, response);
+      const actual = await openApi.api.responseMiddleware(request, response);
 
       expect(actual).toEqual(response);
       expect(logger.log).toBeCalledWith({
@@ -109,7 +109,7 @@ describe('Open API Wrapper', () => {
 
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
-      const response = openApi.api.errorMiddleware(request, error);
+      const response = await openApi.api.errorMiddleware(request, error);
 
       expect(response).toEqual(expected);
       expect(logger.log).toBeCalledWith({
@@ -138,7 +138,7 @@ describe('Open API Wrapper', () => {
 
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
-      const actual = openApi.api.errorMiddleware(request, exception);
+      const actual = await openApi.api.errorMiddleware(request, exception);
 
       expect(actual).toEqual(expected);
       expect(logger.log).toBeCalledWith({
@@ -170,7 +170,7 @@ describe('Open API Wrapper', () => {
 
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
-      const actual = openApi.api.errorMiddleware(request, exception);
+      const actual = await openApi.api.errorMiddleware(request, exception);
 
       expect(actual).toEqual(expected);
       expect(logger.log).toBeCalledWith({
@@ -203,7 +203,7 @@ describe('Open API Wrapper', () => {
 
       const logger = new LoggerMock();
       const openApi = new OpenApiWrapper(logger);
-      const response = openApi.api.errorMiddleware(request, exception);
+      const response = await openApi.api.errorMiddleware(request, exception);
 
       expect(response).toEqual(expected);
       expect(logger.log).toBeCalledWith({
@@ -224,7 +224,7 @@ describe('Open API Wrapper', () => {
 
       const { api } = openApi;
       api.requestMiddleware(requestWithCorrelationHeader);
-      const actual = api.responseMiddleware(requestWithCorrelationHeader, response);
+      const actual = await api.responseMiddleware(requestWithCorrelationHeader, response);
 
       expect(actual).toEqual(response.withCorrelationId(correlationId));
       expect(logger.log).toBeCalledWith({
@@ -245,7 +245,7 @@ describe('Open API Wrapper', () => {
 
       const { api } = openApi;
       api.requestMiddleware(requestWithCorrelationHeader);
-      const actual = api.errorMiddleware(requestWithCorrelationHeader, internalException);
+      const actual = await api.errorMiddleware(requestWithCorrelationHeader, internalException);
 
       expect(actual).toEqual(expectedResponse.withCorrelationId(correlationId));
       expect(logger.log).toBeCalledWith({
@@ -264,7 +264,7 @@ describe('Open API Wrapper', () => {
       const response: ApiResponse = new ApiResponse(statusCode, null);
 
       const { api } = openApi;
-      const actual = api.responseMiddleware(request, response);
+      const actual = await api.responseMiddleware(request, response);
 
       expect(actual.headers['Content-Type']).toEqual('application/hal+json');
     });
