@@ -33,7 +33,7 @@
     "is-error": "~2.2.2",
     "jsonwebtoken": "9.0.0",
     "md5": "~2.3.0",
-    "openapi-factory": "5.2.38",
+    "openapi-factory": "5.4.60",
     "retry-axios": "~2.6.0",
     "uuid": "~8.3.2"
   },
