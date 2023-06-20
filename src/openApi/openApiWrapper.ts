@@ -6,7 +6,6 @@ import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
-import { ILogger } from '../logger/logger';
 
 export interface OpenApiWrapperConfig {
   enableNewRelicTracking: boolean;
@@ -27,7 +26,7 @@ export default class OpenApiWrapper {
 
   private correlationId: string = this.notSet;
 
-  constructor(requestLogger: ILogger, config?: OpenApiWrapperConfig) {
+  constructor(requestLogger, config?: OpenApiWrapperConfig) {
     // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {

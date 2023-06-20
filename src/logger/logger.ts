@@ -5,13 +5,7 @@ import stringify from 'fast-safe-stringify';
 import isError from 'is-error';
 import { redactSecret } from '../util';
 
-export interface ILogger {
-  log: (message: string | SuggestedLogObject) => void;
-
-  startInvocation: (staticData?: any, invocationId?: string) => void;
-}
-
-export default class Logger implements ILogger {
+export default class Logger {
   public invocationId: string;
 
   private readonly logFunction: (...data: any[]) => void;
