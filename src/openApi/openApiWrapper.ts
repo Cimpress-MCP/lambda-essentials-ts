@@ -6,7 +6,7 @@ import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
-import Logger from '../logger/logger';
+import { ILogger } from '../logger/logger';
 
 export interface OpenApiWrapperConfig {
   enableNewRelicTracking: boolean;
@@ -27,11 +27,11 @@ export default class OpenApiWrapper {
 
   private correlationId: string = this.notSet;
 
-  constructor(requestLogger: Logger, config: OpenApiWrapperConfig) {
+  constructor(requestLogger: ILogger, config?: OpenApiWrapperConfig) {
     // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {
-        requestMiddleware: (request: ApiRequest): ApiRequest => {
+        requestMiddleware: async (request: ApiRequest): Promise<ApiRequest> => {
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
@@ -59,12 +59,11 @@ export default class OpenApiWrapper {
             query: request.multiValueQueryStringParameters,
           });
 
-          if (config.enableNewRelicTracking) {
-            import('newrelic').then((newrelic) => {
-              newrelic.addCustomAttributes({
-                canonicalId: this.userPrincipal,
-                correlationId,
-              });
+          if (config?.enableNewRelicTracking) {
+            const newrelic = await import('newrelic');
+            newrelic.addCustomAttributes({
+              canonicalId: this.userPrincipal,
+              correlationId,
             });
           }
 

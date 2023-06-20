@@ -5,7 +5,13 @@ import stringify from 'fast-safe-stringify';
 import isError from 'is-error';
 import { redactSecret } from '../util';
 
-export default class Logger {
+export interface ILogger {
+  log: (message: string | SuggestedLogObject) => void;
+
+  startInvocation: (staticData?: any, invocationId?: string) => void;
+}
+
+export default class Logger implements ILogger {
   public invocationId: string;
 
   private readonly logFunction: (...data: any[]) => void;
@@ -30,6 +36,7 @@ export default class Logger {
     this.invocationId = invocationId ?? uuid.v4();
   }
 
+  // eslint-disable-next-line complexity
   log(message: string | SuggestedLogObject): void {
     const type = typeof message;
     if (type === 'undefined' || (type === 'string' && message === '')) {
