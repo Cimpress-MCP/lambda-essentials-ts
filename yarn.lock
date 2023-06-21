@@ -3917,10 +3917,10 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-openapi-factory@5.2.38:
-  version "5.2.38"
-  resolved "https://registry.yarnpkg.com/openapi-factory/-/openapi-factory-5.2.38.tgz#482fbcde1c4961104dcb1ecd98bb351c21fc5b92"
-  integrity sha512-hbDOGUuZ587ccm8a4XHFBEtIroVmdIFHe7ArloiyRMXU7Kr7ZPb0BhgW+H+Qx8ksKtkYAASlDvsmvNrK/o5XuQ==
+openapi-factory@5.4.60:
+  version "5.4.60"
+  resolved "https://registry.yarnpkg.com/openapi-factory/-/openapi-factory-5.4.60.tgz#c4bf3436c11c96d1387e0f6e24534f5310e014b6"
+  integrity sha512-nfQVI6CBUsyhr7ax9dULveQ8NxB8nxGxPFHDEEYfEh5cMXHn9rdQ98fuHDa+53Z0iehPUjptePNLbh83zHiXuQ==
 
 opencollective-postinstall@^2.0.2:
   version "2.0.3"
