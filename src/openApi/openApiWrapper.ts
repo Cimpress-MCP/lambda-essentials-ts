@@ -26,6 +26,8 @@ export default class OpenApiWrapper {
 
   private correlationId: string = this.notSet;
 
+  private newrelic;
+
   constructor(requestLogger, config?: OpenApiWrapperConfig) {
     // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
@@ -59,8 +61,10 @@ export default class OpenApiWrapper {
           });
 
           if (config?.enableNewRelicTracking) {
-            const newrelic = await import('newrelic');
-            newrelic.addCustomAttributes({
+            if (!this.newrelic) {
+              this.newrelic = await import('newrelic');
+            }
+            this.newrelic.addCustomAttributes({
               canonicalId: this.userPrincipal,
               correlationId,
             });
