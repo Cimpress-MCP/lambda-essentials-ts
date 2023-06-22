@@ -7,12 +7,14 @@ import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel } from './openApiModel';
 
+export interface OpenApiWrapperConfig {
+  enableNewRelicTracking: boolean;
+}
+
 export default class OpenApiWrapper {
   private readonly notSet = 'not-set';
 
   private readonly cleared = 'cleared';
-
-  private readonly canonicalIdKey = 'https://claims.cimpress.io/canonical_id';
 
   public api: OpenApiModel;
 
@@ -24,11 +26,13 @@ export default class OpenApiWrapper {
 
   private correlationId: string = this.notSet;
 
-  constructor(requestLogger) {
+  private newrelic;
+
+  constructor(requestLogger, config?: OpenApiWrapperConfig) {
     // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {
-        requestMiddleware: (request: ApiRequest): ApiRequest => {
+        requestMiddleware: async (request: ApiRequest): Promise<ApiRequest> => {
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
@@ -55,9 +59,23 @@ export default class OpenApiWrapper {
             user: this.userPrincipal,
             query: request.multiValueQueryStringParameters,
           });
+
+          if (config?.enableNewRelicTracking) {
+            if (!this.newrelic) {
+              this.newrelic = await import('newrelic');
+            }
+            this.newrelic.addCustomAttributes({
+              canonicalId: this.userPrincipal,
+              correlationId,
+            });
+          }
+
           return request;
         },
-        responseMiddleware: (request: ApiRequest, response: ApiResponse): ApiResponse => {
+        responseMiddleware: async (
+          request: ApiRequest,
+          response: ApiResponse,
+        ): Promise<ApiResponse> => {
           requestLogger.log({
             title: 'ResponseLogger',
             level: 'INFO',
@@ -70,7 +88,10 @@ export default class OpenApiWrapper {
           return response.withCorrelationId(correlationId);
         },
 
-        errorMiddleware: (request: ApiRequest, error: Exception | Error): ApiResponse => {
+        errorMiddleware: async (
+          request: ApiRequest,
+          error: Exception | Error,
+        ): Promise<ApiResponse> => {
           const { correlationId } = this;
           this.clearContext();
           const serializedError = serializeObject(error, true);

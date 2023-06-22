@@ -30,6 +30,7 @@ export default class Logger {
     this.invocationId = invocationId ?? uuid.v4();
   }
 
+  // eslint-disable-next-line complexity
   log(message: string | SuggestedLogObject): void {
     const type = typeof message;
     if (type === 'undefined' || (type === 'string' && message === '')) {

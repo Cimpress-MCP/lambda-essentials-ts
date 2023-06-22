@@ -34,3 +34,5 @@ export interface PatchRequest<Body = any, Query = any> extends ApiRequest<Body, 
 export interface GetRequest<Query = any> extends Omit<ApiRequest<any, Query>, 'body'> {
   queryStringParameters: Query;
 }
+
+export interface DeleteRequest extends Omit<ApiRequest, 'body' | 'query'> {}

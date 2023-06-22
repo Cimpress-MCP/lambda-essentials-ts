@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.2.0] - 2023-06-08
+
+### Added
+
+Tracking of `canonicalId` and `correlationId` in New Relic.
+
+!IMPORTANT! You must exclude the `newrelic` module from `webpack.config.ts` like so:
+
+```
+externals: ['newrelic']
+```
+
+### Added
+
+The `DeleteRequest` model.
+
 ## [5.1.10] - 2023-01-13
 
 ### Changed
