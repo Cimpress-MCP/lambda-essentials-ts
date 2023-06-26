@@ -30,10 +30,8 @@ export default class OpenApiWrapper {
 
   constructor(requestLogger, config?: OpenApiWrapperConfig) {
     if (config?.enableNewRelicTracking) {
-      if (!this.newrelic) {
-        // eslint-disable-next-line global-require
-        this.newrelic = require('newrelic');
-      }
+      // eslint-disable-next-line global-require
+      this.newrelic = require('newrelic');
     }
 
     // @ts-ignore Later Use the options Type from OpenApiFactory
