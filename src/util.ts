@@ -41,7 +41,10 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
 
 export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
   if (!error.response) {
-    return undefined;
+    return {
+      status: 500,
+      details: error,
+    };
   }
 
   const { status, data } = error.response;

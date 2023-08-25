@@ -97,12 +97,22 @@ describe('Util', () => {
       name: 'test-name',
       toJSON: () => ({}),
     };
+
     test('serializes AxiosError objects', () => {
       const expected = {
         details: 'test-details',
         status: 409,
       };
       const serializedError = serializeAxiosError(axiosError);
+      expect(serializedError).toEqual(expected);
+    });
+
+    test('serializes any objects', () => {
+      const expected = {
+        details: error,
+        status: 500,
+      };
+      const serializedError = serializeAxiosError(error as any);
       expect(serializedError).toEqual(expected);
     });
   });
