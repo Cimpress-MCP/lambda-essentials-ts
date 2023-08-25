@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-HttpClient now also logs unexpected (e.g. network) rrors that are not coming from Axios
+HttpClient now also logs unexpected (e.g. network) errors that are not coming from Axios
 
 ## [5.2.0] - 2023-06-08
 
