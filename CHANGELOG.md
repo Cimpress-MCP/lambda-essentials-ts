@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.3.0] - 2023-09-07
+
+### Changed
+
+The `getUserToken()` and `getUserPrincipal()` methods now support multiple sources of for their values
+
+`getUserToken()` in priority order:
+
+1. `request.authorizerContext.accessToken` (new)
+2. `request.authorizerContext.jwt`
+3. `request.headers.Authorization`
+
+`getUserPrincipal()` in priority order:
+
+1. `authorizerContext.principalId` (new)
+2. `authorizerContext.canonicalId`
+3. `request.headers.Authorization`
+
 ## [5.2.2] - 2023-08-25
 
 ### Added

@@ -1,6 +1,6 @@
 import OpenApi from 'openapi-factory';
 import * as uuid from 'uuid';
-import { ApiRequest } from './apiRequestModel';
+import { ApiRequest, AuthorizerContext } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
@@ -41,13 +41,13 @@ export default class OpenApiWrapper {
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
-          // TODO: restrict the alternative way of resolving token and principal only for localhost
-          this.userToken =
-            request.requestContext.authorizer?.jwt ?? request.headers.Authorization?.split(' ')[1];
-          this.userPrincipal =
-            request.requestContext.authorizer?.canonicalId ??
-            safeJwtCanonicalIdParse(this.userToken) ??
-            'unknown';
+          const userData = this.determineUserData(
+            request.headers,
+            request.requestContext.authorizer,
+          );
+          this.userToken = userData.userToken ?? this.notSet;
+          this.userPrincipal = userData.userPrincipal ?? this.notSet;
+
           this.requestId = request.requestContext.requestId;
           requestLogger.log({
             title: 'RequestLogger',
@@ -160,5 +160,29 @@ export default class OpenApiWrapper {
     const existingCorrelationId = headers[orionCorrelationIdRoot];
     this.correlationId = existingCorrelationId ?? uuid.v4();
     return this.correlationId;
+  }
+
+  private determineUserData(
+    headers: Record<string, string>,
+    authorizerContext?: AuthorizerContext,
+  ): {
+    userToken?: string;
+    userPrincipal?: string;
+  } {
+    if (authorizerContext) {
+      return {
+        userPrincipal: authorizerContext.principalId ?? authorizerContext.canonicalId,
+        userToken: authorizerContext.accessToken ?? authorizerContext.jwt,
+      };
+    }
+
+    if (headers.Authorization) {
+      const userToken = headers.Authorization.split(' ')?.[1];
+      const userPrincipal = safeJwtCanonicalIdParse(userToken);
+
+      return { userToken, userPrincipal };
+    }
+
+    return { userToken: undefined, userPrincipal: undefined };
   }
 }
