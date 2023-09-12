@@ -5,11 +5,7 @@ export interface ApiRequest<Body = any, Query = any> {
   route: string;
   isBase64Encoded: Boolean;
   requestContext: {
-    authorizer?: {
-      jwt: string;
-      canonicalId: string;
-      principalId: string;
-    };
+    authorizer?: AuthorizerContext;
     requestId: string;
   };
   headers: Record<string, string>;
@@ -17,6 +13,13 @@ export interface ApiRequest<Body = any, Query = any> {
   stageVariables: Record<string, string>;
   queryStringParameters?: Query;
   multiValueQueryStringParameters?: any;
+}
+
+export interface AuthorizerContext {
+  jwt?: string;
+  accessToken?: string;
+  canonicalId?: string;
+  principalId?: string;
 }
 
 export interface PostRequest<Body = any, Query = any> extends ApiRequest<Body, Query> {
