@@ -171,8 +171,8 @@ export default class OpenApiWrapper {
   } {
     if (authorizerContext) {
       return {
-        userPrincipal: authorizerContext.principalId ?? authorizerContext.canonicalId,
-        userToken: authorizerContext.accessToken ?? authorizerContext.jwt,
+        userPrincipal: authorizerContext.canonicalId ?? authorizerContext.principalId,
+        userToken: authorizerContext.jwt ?? authorizerContext.accessToken,
       };
     }
 

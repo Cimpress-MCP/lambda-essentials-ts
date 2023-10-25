@@ -52,6 +52,18 @@ describe('Open API Wrapper', () => {
       requestId: 'tests-request-id',
     },
   };
+  const requestWithOldAndNewStyleAuthorizer: ApiRequest<any> = {
+    ...request,
+    requestContext: {
+      authorizer: {
+        canonicalId,
+        principalId,
+        jwt,
+        accessToken,
+      },
+      requestId: 'tests-request-id',
+    },
+  };
   const testJwt =
     'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaHR0cHM6Ly9jbGFpbXMuY2ltcHJlc3MuaW8vY2Fub25pY2FsX2lkIjoiam9obkBkb2Uub3JnIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.XNjjaJDz4g8AecLBIDZY6aDwANCNMKg2NrcNxaJ-0JaqoGm0fBGPCZfbtGuf4-8DVqnwmrWslt7tMEj8QIU_TL1cWsX83ZGggM4crGva8tLw54Vhg5BrNWCOBiMphxGzU-5DbXPWvtnWatJgDdBuRSegZK5slpa8DnmXiMNkXxZhyulTbZYkArE2e16NFZhVANWmR3A4K_0ETF-s3uARvua9rPOxkaaxHPIkoZ58CsuD1p6pqi8KDthiW0OCry6o2uPIG-MfyP0gKDPD88XtVD5pcr6WWhNv37ZnucG75wuxE8c6eMj_pPCrt_eoM8ygUc9GY7XoLmZZAvI-szlivw';
   const requestWithAuthorizationHeader: ApiRequest<any> = {
@@ -100,6 +112,14 @@ describe('Open API Wrapper', () => {
     test('sets userToken and userPrincipal from old-style Authorizer', async () => {
       const openApi = new OpenApiWrapper(new LoggerMock());
       await openApi.api.requestMiddleware(requestWithOldStyleAuthorizer);
+
+      expect(openApi.getUserToken()).toEqual(jwt);
+      expect(openApi.getUserPrincipal()).toEqual(canonicalId);
+    });
+
+    test('sets userToken and userPrincipal from old-style Authorizer with priority', async () => {
+      const openApi = new OpenApiWrapper(new LoggerMock());
+      await openApi.api.requestMiddleware(requestWithOldAndNewStyleAuthorizer);
 
       expect(openApi.getUserToken()).toEqual(jwt);
       expect(openApi.getUserPrincipal()).toEqual(canonicalId);
