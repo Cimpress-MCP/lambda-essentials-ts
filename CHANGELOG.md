@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.3.1] - 2023-10-25
+
+### Fixed
+
+The `getUserToken()` and `getUserPrincipal()` order was wrongly set in version `5.3.0`. The new fixed
+priority order:
+
+`getUserToken()`
+
+1. `request.authorizerContext.jwt`
+2. `request.authorizerContext.accessToken` (new)
+3. `request.headers.Authorization`
+
+`getUserPrincipal()`
+
+1. `authorizerContext.canonicalId` (**prefer canonicalId**)
+2. `authorizerContext.principalId` (new)
+3. `request.headers.Authorization`
+
 ## [5.3.0] - 2023-09-07
 
 ### Changed
