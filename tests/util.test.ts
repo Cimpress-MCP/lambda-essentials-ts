@@ -115,6 +115,36 @@ describe('Util', () => {
       const serializedError = serializeAxiosError(error as any);
       expect(serializedError).toEqual(expected);
     });
+
+    test('serializes non-Exception objects which also have "details" field', () => {
+      const expected = {
+        details: {
+          details: {},
+          error,
+        },
+        status: 500,
+      };
+
+      const axiosErrorWithNonExceptionError: AxiosError = {
+        isAxiosError: true,
+        message: 'test-message',
+        response: {
+          data: {
+            details: {},
+            error,
+          },
+          status: 500,
+          config: {},
+          headers: null,
+          statusText: 'test-status-text',
+        },
+        config: {},
+        name: 'test-name',
+        toJSON: () => ({}),
+      };
+      const serializedError = serializeAxiosError(axiosErrorWithNonExceptionError as any);
+      expect(serializedError).toEqual(expected);
+    });
   });
 
   describe('redactSecret', () => {

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.3.2] - 2024-02-08
+
+### Fixed
+
+Error details of external HTTP error resposes are propagated correctly
+
 ## [5.3.1] - 2023-10-25
 
 ### Fixed
