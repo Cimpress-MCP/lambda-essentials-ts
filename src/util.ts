@@ -50,7 +50,7 @@ export function serializeAxiosError(error: AxiosError): SerializedAxiosError | u
   const { status, data } = error.response;
   return {
     status: data.originalStatusCode ?? status, // Propagate original status code of ClientException
-    details: data.details ? data.details : data, // Prevent wrapping of Exception
+    details: data.details && Object.keys(data.details).length > 0 ? data.details : data, // Prevent wrapping of Exception
   };
 }
 
