@@ -13,21 +13,33 @@ export class ClientException extends Exception {
     422: 422,
   };
 
-  constructor(serviceName: string, originalStatusCode?: number, details?: any) {
+  constructor(
+    serviceName: string,
+    originalStatusCode?: number,
+    details?: any,
+    statusCodeMapOverride?: Record<number, number>,
+  ) {
     super(
       `Dependent service "${serviceName}" returned error`,
-      ClientException.convertStatusCode(originalStatusCode),
+      ClientException.convertStatusCode(originalStatusCode, statusCodeMapOverride),
       details,
     );
     this.serviceName = serviceName;
     this.originalStatusCode = originalStatusCode;
   }
 
-  private static convertStatusCode(originalStatusCode?: number) {
+  private static convertStatusCode(
+    originalStatusCode?: number,
+    statusCodeMapOverride?: Record<number, number>,
+  ) {
     let statusCode = 503;
+    const statusCodeMap = {
+      ...ClientException.statusCodeMap,
+      ...(statusCodeMapOverride || {}),
+    };
 
-    if (originalStatusCode && this.statusCodeMap[originalStatusCode]) {
-      statusCode = this.statusCodeMap[originalStatusCode];
+    if (originalStatusCode && statusCodeMap[originalStatusCode]) {
+      statusCode = statusCodeMap[originalStatusCode];
     }
 
     return statusCode;

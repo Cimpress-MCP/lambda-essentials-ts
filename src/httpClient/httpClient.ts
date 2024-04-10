@@ -43,7 +43,9 @@ export default class HttpClient {
   private readonly enableCache: boolean;
 
   private readonly timeout?: number;
-  
+
+  private readonly clientExceptionStatusCodeMapOverride?: Record<number, number>;
+
   /**
    * Create a new Instance of the HttpClient
    */
@@ -57,6 +59,7 @@ export default class HttpClient {
     this.enableCache = options?.enableCache ?? false;
     this.enableRetry = options?.enableRetry ?? false;
     this.timeout = options?.timeout;
+    this.clientExceptionStatusCodeMapOverride = options?.clientExceptionStatusCodeMapOverride;
     this.client =
       options?.client ??
       axios.create({
@@ -103,7 +106,7 @@ export default class HttpClient {
     if (this.timeout) {
       this.client.defaults.timeout = this.timeout;
     }
-    
+
     this.client.interceptors.request.use(
       (config) => {
         if (this.logOptions.enabledLogs.includes(HttpLogType.requests)) {
@@ -135,6 +138,7 @@ export default class HttpClient {
           hostname,
           serializedAxiosError?.status,
           serializedAxiosError?.details,
+          this.clientExceptionStatusCodeMapOverride,
         );
       },
     );
@@ -183,6 +187,7 @@ export default class HttpClient {
           hostname,
           serializedAxiosError?.status,
           serializedAxiosError?.details,
+          this.clientExceptionStatusCodeMapOverride,
         );
       },
     );
@@ -360,6 +365,10 @@ export interface HttpClientOptions {
    * @link https://github.com/axios/axios/blob/main/README.md#request-config
    */
   timeout?: number;
+  /**
+   * Override the default mapping of status code when wrapping error responses returned by dependencies into ClientException
+   */
+  clientExceptionStatusCodeMapOverride?: Record<number, number>;
 }
 
 /**
