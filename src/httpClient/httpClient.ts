@@ -366,7 +366,8 @@ export interface HttpClientOptions {
    */
   timeout?: number;
   /**
-   * Override the default mapping of status code when wrapping error responses returned by dependencies into ClientException
+   * Override the default mapping of status code when wrapping error responses returned by dependencies into ClientException.
+   * This is useful, when dependent services return incorrect status codes than then drive incorrect behavior upstream (e.g. 403 instead of 503)
    */
   clientExceptionStatusCodeMapOverride?: Record<number, number>;
 }
