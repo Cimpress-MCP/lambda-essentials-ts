@@ -7,9 +7,9 @@ interface AxiosErrorTestData {
 }
 
 describe('ClientException', () => {
-  describe('converts Axios errors', () => {
-    const testServiceName = 'test-service-name';
+  const testServiceName = 'test-service-name';
 
+  describe('converts Axios errors', () => {
     const createError = (status: number): SerializedAxiosError => ({
       status,
       details: [],
@@ -52,5 +52,32 @@ describe('ClientException', () => {
         expect(clientException.details).toEqual(axiosError);
       }),
     );
+  });
+
+  describe('clientExceptionStatusCodeMapOverride', () => {
+    test('overrides default client exception status code mapping with clientExceptionStatusCodeMapOverride', async () => {
+      const expectedStatusCode = 503;
+      const originalStatusCode = 403;
+      const axiosError: SerializedAxiosError = {
+        status: originalStatusCode,
+        details: [],
+      };
+      const clientExceptionStatusCodeMapOverride = {
+        403: 503,
+      };
+
+      const clientException = new ClientException(
+        testServiceName,
+        axiosError.status,
+        axiosError,
+        clientExceptionStatusCodeMapOverride,
+      );
+
+      expect(clientException.message).toEqual(
+        `Dependent service "${testServiceName}" returned error`,
+      );
+      expect(clientException.originalStatusCode).toEqual(originalStatusCode);
+      expect(clientException.statusCode).toEqual(expectedStatusCode);
+    });
   });
 });

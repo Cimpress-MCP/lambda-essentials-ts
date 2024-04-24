@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [5.4.0] - 2024-02-08
+
+### Added
+
+HttpClient options now accept `clientExceptionStatusCodeMapOverride` which can be used to override the default HTTP error status code mapping. This is useful e.g. when a dependent service is not following REST-ful best practices and e.g. returns a 403 when there's an intermittent network error communicating with the authorization service
+
 ## [5.3.2] - 2024-02-08
 
 ### Fixed
 
-Error details of external HTTP error resposes are propagated correctly
+Error details of external HTTP error responses are propagated correctly
 
 ## [5.3.1] - 2023-10-25
 
