@@ -1,6 +1,6 @@
-import { SecretsManager } from 'aws-sdk';
 import { SecretsManagerTokenConfiguration, SecretsManagerTokenProvider } from '../../src';
 import { Auth0Secret } from '../../src/tokenProvider/tokenProvider';
+import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 
 describe('Secrets Manager Token Provider', () => {
   const tokenConfiguration: SecretsManagerTokenConfiguration = {
@@ -11,10 +11,10 @@ describe('Secrets Manager Token Provider', () => {
 
   describe('getClientSecret', () => {
     test('throws when secret was not retrieved', async () => {
-      const promisedSecret = Promise.resolve({ SecretString: undefined });
+      const promisedSecret = { SecretString: undefined };
       const SecretsManagerMock = jest.fn().mockImplementation(
-        (): Partial<SecretsManager> => ({
-          getSecretValue: jest.fn().mockReturnValue({ promise: () => promisedSecret }),
+        (): Partial<SecretsManagerClient> => ({
+          send: jest.fn().mockResolvedValueOnce(promisedSecret),
         }),
       );
 
@@ -33,10 +33,10 @@ describe('Secrets Manager Token Provider', () => {
         Auth0ClientID: 'test-client-id',
         Auth0ClientSecret: 'test-secret',
       };
-      const promisedSecret = Promise.resolve({ SecretString: JSON.stringify(expectedSecret) });
+      const promisedSecret = { SecretString: JSON.stringify(expectedSecret) };
       const SecretsManagerMock = jest.fn().mockImplementation(
-        (): Partial<SecretsManager> => ({
-          getSecretValue: jest.fn().mockReturnValue({ promise: () => promisedSecret }),
+        (): Partial<SecretsManagerClient> => ({
+          send: jest.fn().mockResolvedValueOnce(promisedSecret),
         }),
       );
 
@@ -48,9 +48,11 @@ describe('Secrets Manager Token Provider', () => {
 
       const actualSecret = await tokenProvider.getClientSecret();
       expect(actualSecret).toEqual(expectedSecret);
-      expect(secretsManager.getSecretValue).toHaveBeenCalledWith({
-        SecretId: tokenConfiguration.clientSecretId,
-      });
+      expect(secretsManager.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input: { SecretId: tokenConfiguration.clientSecretId },
+        }),
+      );
     });
   });
 });

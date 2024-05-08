@@ -1,12 +1,12 @@
-import { KMS } from 'aws-sdk';
 import TokenProvider, {
   Auth0Secret,
   TokenConfiguration,
   TokenProviderOptions,
 } from './tokenProvider';
+import { DecryptCommand, KMSClient } from '@aws-sdk/client-kms';
 
 export default class KmsTokenProvider extends TokenProvider {
-  private kmsClient: KMS;
+  private kmsClient: KMSClient;
 
   private kmsConfiguration: KmsTokenConfiguration;
 
@@ -17,13 +17,12 @@ export default class KmsTokenProvider extends TokenProvider {
   }
 
   public async getClientSecret(): Promise<Auth0Secret | undefined> {
-    const secret = await this.kmsClient
-      .decrypt({
+    const data = await this.kmsClient.send(
+      new DecryptCommand({
         CiphertextBlob: Buffer.from(this.kmsConfiguration.encryptedClientSecret, 'base64'),
-      })
-      .promise()
-      .then((data) => data.Plaintext?.toString());
-
+      }),
+    );
+    const secret = data.Plaintext?.toString();
     if (!secret) {
       throw new Error('Request error: failed to decrypt secret using KMS');
     }
@@ -36,7 +35,7 @@ export interface KmsTokenProviderOptions extends TokenProviderOptions {
   /**
    * AWS KMS Client
    */
-  kmsClient: KMS;
+  kmsClient: KMSClient;
   /**
    * Configuration needed for the token
    */
