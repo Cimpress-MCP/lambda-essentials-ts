@@ -1,6 +1,6 @@
-import { KMS } from 'aws-sdk';
 import { KmsTokenConfiguration, KmsTokenProvider } from '../../src';
 import { Auth0Secret } from '../../src/tokenProvider/tokenProvider';
+import { KMSClient } from '@aws-sdk/client-kms';
 
 describe('KMS Token Provider', () => {
   const tokenConfiguration: KmsTokenConfiguration = {
@@ -12,10 +12,10 @@ describe('KMS Token Provider', () => {
 
   describe('getClientSecret', () => {
     test('throws when secret was not decrypted', async () => {
-      const promisedDecryptedText = Promise.resolve({ data: { Plaintext: undefined } });
+      const promisedDecryptedText = { data: { Plaintext: undefined } };
       const KMSMock = jest.fn().mockImplementation(
-        (): Partial<KMS> => ({
-          decrypt: jest.fn().mockReturnValue({ promise: () => promisedDecryptedText }),
+        (): Partial<KMSClient> => ({
+          send: jest.fn().mockResolvedValue(promisedDecryptedText),
         }),
       );
 
@@ -34,12 +34,12 @@ describe('KMS Token Provider', () => {
         Auth0ClientID: 'test-client-id',
         Auth0ClientSecret: 'test-secret',
       };
-      const promisedDecryptedText = Promise.resolve({
+      const promisedDecryptedText = {
         Plaintext: expectedSecret.Auth0ClientSecret,
-      });
+      };
       const KMSMock = jest.fn().mockImplementation(
-        (): Partial<KMS> => ({
-          decrypt: jest.fn().mockReturnValue({ promise: () => promisedDecryptedText }),
+        (): Partial<KMSClient> => ({
+          send: jest.fn().mockResolvedValue(promisedDecryptedText),
         }),
       );
 
@@ -51,9 +51,13 @@ describe('KMS Token Provider', () => {
 
       const actualSecret = await tokenProvider.getClientSecret();
       expect(actualSecret).toEqual(expectedSecret);
-      expect(kms.decrypt).toHaveBeenCalledWith({
-        CiphertextBlob: Buffer.from(tokenConfiguration.encryptedClientSecret, 'base64'),
-      });
+      expect(kms.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input: {
+            CiphertextBlob: Buffer.from(tokenConfiguration.encryptedClientSecret, 'base64'),
+          },
+        }),
+      );
     });
   });
 });

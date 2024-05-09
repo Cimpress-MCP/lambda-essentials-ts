@@ -1,12 +1,12 @@
-import { SecretsManager } from 'aws-sdk';
 import TokenProvider, {
   Auth0Secret,
   TokenConfiguration,
   TokenProviderOptions,
 } from './tokenProvider';
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 
 export default class SecretsManagerTokenProvider extends TokenProvider {
-  private secretsManagerClient: SecretsManager;
+  private secretsManagerClient: SecretsManagerClient;
 
   private secretsManagerConfiguration: SecretsManagerTokenConfiguration;
 
@@ -17,9 +17,11 @@ export default class SecretsManagerTokenProvider extends TokenProvider {
   }
 
   public async getClientSecret(): Promise<Auth0Secret | undefined> {
-    const secret = await this.secretsManagerClient
-      .getSecretValue({ SecretId: this.secretsManagerConfiguration.clientSecretId })
-      .promise();
+    const secret = await this.secretsManagerClient.send(
+      new GetSecretValueCommand({
+        SecretId: this.secretsManagerConfiguration.clientSecretId,
+      }),
+    );
 
     if (!secret?.SecretString) {
       throw new Error('Request error: failed to retrieve secret from Secrets Manager');
@@ -33,7 +35,7 @@ export interface SecretsManagerTokenProviderOptions extends TokenProviderOptions
   /**
    * AWS Secrets Manager Client
    */
-  secretsManagerClient: SecretsManager;
+  secretsManagerClient: SecretsManagerClient;
   /**
    * Configuration needed for the token
    */

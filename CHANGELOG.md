@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [6.0.0] - 2022-02-22
+
+### Changed
+
+- **[Breaking change]** Upgraded aws-sdk to v3 which has `SecretsManager` and `KMS` replaced by `SecretsManagerClient` and `KMSClient` class.
+  The functionality and interface remains the same, the imports need to be changed.
+
 ## [5.4.0] - 2024-02-08
 
 ### Added
