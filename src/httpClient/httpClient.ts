@@ -109,7 +109,11 @@ export default class HttpClient {
 
     this.client.interceptors.request.use(
       (config) => {
-        if (this.logOptions.enabledLogs.includes(HttpLogType.requests)) {
+        if (
+          this.logOptions.enabledLogs.includes(HttpLogType.requests) &&
+          (this.logOptions.enabledLogForClients === undefined ||
+            this.logOptions.enabledLogForClients.includes(this.client.defaults.baseURL ?? ''))
+        ) {
           this.logFunction({
             title: 'HTTP Request',
             level: 'INFO',
@@ -145,7 +149,11 @@ export default class HttpClient {
 
     this.client.interceptors.response.use(
       (response) => {
-        if (this.logOptions.enabledLogs.includes(HttpLogType.responses)) {
+        if (
+          this.logOptions.enabledLogs.includes(HttpLogType.responses) &&
+          (this.logOptions.enabledLogForClients === undefined ||
+            this.logOptions.enabledLogForClients.includes(this.client.defaults.baseURL ?? ''))
+        ) {
           this.logFunction({
             title: 'HTTP Response',
             level: 'INFO',
@@ -377,4 +385,5 @@ export interface HttpClientOptions {
  */
 export interface HttpLogOptions {
   enabledLogs: HttpLogType[];
+  enabledLogForClients?: string[];
 }
