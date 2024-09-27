@@ -17,10 +17,11 @@ export class ClientException extends Exception {
     serviceName: string,
     originalStatusCode?: number,
     details?: any,
+    originalMessage?: string,
     statusCodeMapOverride?: Record<number, number>,
   ) {
     super(
-      `Dependent service "${serviceName}" returned error`,
+      `Dependent service "${serviceName}" returned error: ${originalMessage ?? 'Unknown error'}`,
       ClientException.convertStatusCode(originalStatusCode, statusCodeMapOverride),
       details,
     );

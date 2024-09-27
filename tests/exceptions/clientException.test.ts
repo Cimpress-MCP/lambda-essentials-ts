@@ -61,6 +61,7 @@ describe('ClientException', () => {
       const axiosError: SerializedAxiosError = {
         status: originalStatusCode,
         details: [],
+        message: 'test-message',
       };
       const clientExceptionStatusCodeMapOverride = {
         403: 503,
@@ -70,6 +71,7 @@ describe('ClientException', () => {
         testServiceName,
         axiosError.status,
         axiosError,
+        axiosError.message,
         clientExceptionStatusCodeMapOverride,
       );
 

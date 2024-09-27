@@ -138,6 +138,7 @@ export default class HttpClient {
           hostname,
           serializedAxiosError?.status,
           serializedAxiosError?.details,
+          serializedAxiosError?.message,
           this.clientExceptionStatusCodeMapOverride,
         );
       },
@@ -187,6 +188,7 @@ export default class HttpClient {
           hostname,
           serializedAxiosError?.status,
           serializedAxiosError?.details,
+          serializedAxiosError?.message,
           this.clientExceptionStatusCodeMapOverride,
         );
       },
