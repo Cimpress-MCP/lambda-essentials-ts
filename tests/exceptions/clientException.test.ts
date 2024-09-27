@@ -44,7 +44,7 @@ describe('ClientException', () => {
         const clientException = new ClientException(testServiceName, axiosError.status, axiosError);
 
         expect(clientException.message).toEqual(
-          `Dependent service "${testServiceName}" returned error`,
+          `Dependent service "${testServiceName}" returned error: Unknown error`,
         );
         expect(clientException.originalStatusCode).toEqual(originalStatusCode);
         expect(clientException.statusCode).toEqual(exceptionStatusCode);
@@ -76,7 +76,7 @@ describe('ClientException', () => {
       );
 
       expect(clientException.message).toEqual(
-        `Dependent service "${testServiceName}" returned error`,
+        `Dependent service "${testServiceName}" returned error: test-message`,
       );
       expect(clientException.originalStatusCode).toEqual(originalStatusCode);
       expect(clientException.statusCode).toEqual(expectedStatusCode);
