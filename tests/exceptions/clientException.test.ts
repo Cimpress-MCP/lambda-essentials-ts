@@ -44,7 +44,7 @@ describe('ClientException', () => {
         const clientException = new ClientException(testServiceName, axiosError.status, axiosError);
 
         expect(clientException.message).toEqual(
-          `Dependent service "${testServiceName}" returned error`,
+          `Dependent service "${testServiceName}" returned error: Unknown error`,
         );
         expect(clientException.originalStatusCode).toEqual(originalStatusCode);
         expect(clientException.statusCode).toEqual(exceptionStatusCode);
@@ -61,6 +61,7 @@ describe('ClientException', () => {
       const axiosError: SerializedAxiosError = {
         status: originalStatusCode,
         details: [],
+        message: 'test-message',
       };
       const clientExceptionStatusCodeMapOverride = {
         403: 503,
@@ -70,11 +71,12 @@ describe('ClientException', () => {
         testServiceName,
         axiosError.status,
         axiosError,
+        axiosError.message,
         clientExceptionStatusCodeMapOverride,
       );
 
       expect(clientException.message).toEqual(
-        `Dependent service "${testServiceName}" returned error`,
+        `Dependent service "${testServiceName}" returned error: test-message`,
       );
       expect(clientException.originalStatusCode).toEqual(originalStatusCode);
       expect(clientException.statusCode).toEqual(expectedStatusCode);

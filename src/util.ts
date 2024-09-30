@@ -51,10 +51,12 @@ export function serializeAxiosError(error: AxiosError): SerializedAxiosError | u
   return {
     status: data.originalStatusCode ?? status, // Propagate original status code of ClientException
     details: data.details && Object.keys(data.details).length > 0 ? data.details : data, // Prevent wrapping of Exception
+    message: data.message,
   };
 }
 
 export interface SerializedAxiosError {
   status: number;
   details: any;
+  message?: string;
 }

@@ -220,11 +220,16 @@ describe('Open API Wrapper', () => {
 
     test('returns 500 and logs INFO with details when ClientException exception is caught', async () => {
       const testServiceName = 'test-service-name';
-      const exception = new ClientException(testServiceName, 409, { more: 'details' });
+      const exception = new ClientException(
+        testServiceName,
+        409,
+        { more: 'details' },
+        'test-message',
+      );
       const expected: Partial<ApiResponse> = {
         body: {
           details: exception.details,
-          title: `Dependent service "${testServiceName}" returned error`,
+          title: `Dependent service "${testServiceName}" returned error: test-message`,
         },
         statusCode: 503,
         headers: {
@@ -245,7 +250,7 @@ describe('Open API Wrapper', () => {
         title: 'ErrorLogger',
         details: exception.details,
         statusCode: 503,
-        message: `Dependent service "${testServiceName}" returned error`,
+        message: `Dependent service "${testServiceName}" returned error: test-message`,
         originalStatusCode: 409,
         serviceName: testServiceName,
         stack: expect.any(String),
