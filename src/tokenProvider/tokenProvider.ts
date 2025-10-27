@@ -1,6 +1,6 @@
 import jwtManager from 'jsonwebtoken';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { HttpClient } from '../../lib';
+import HttpClient from '../httpClient/httpClient';
 
 export default abstract class TokenProvider {
   private httpClient: TokenProviderHttpClient;
