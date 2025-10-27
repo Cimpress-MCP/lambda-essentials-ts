@@ -19,10 +19,14 @@ export default class KmsTokenProvider extends TokenProvider {
   public async getClientSecret(): Promise<Auth0Secret | undefined> {
     const data = await this.kmsClient.send(
       new DecryptCommand({
-        CiphertextBlob: Buffer.from(this.kmsConfiguration.encryptedClientSecret, 'base64'),
+        CiphertextBlob: new Uint8Array(
+          Buffer.from(this.kmsConfiguration.encryptedClientSecret, 'base64'),
+        ),
       }),
     );
-    const secret = data.Plaintext?.toString();
+    const secret = data.Plaintext
+      ? Buffer.from(data.Plaintext as Uint8Array).toString()
+      : undefined;
     if (!secret) {
       throw new Error('Request error: failed to decrypt secret using KMS');
     }
