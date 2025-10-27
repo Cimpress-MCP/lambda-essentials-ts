@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
-## [6.0.1] - 2025-10-27
+## [6.1.1] - 2025-10-27
 
 ### Changed
 
 - TokenProviderHttpClient now uses the http client with retries as default.
+
+## [6.1.0] - 2024-09-30
+
+### Changed
+
+- Preserve the original message in ClientException
 
 ## [6.0.0] - 2024-02-22
 
