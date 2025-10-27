@@ -1,6 +1,6 @@
 import OpenApi from 'openapi-factory';
 import * as uuid from 'uuid';
-import { ApiRequest, AuthorizerContext } from './apiRequestModel';
+import { AuthorizerContext } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
@@ -37,7 +37,7 @@ export default class OpenApiWrapper {
     // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {
-        requestMiddleware: async (request: ApiRequest): Promise<ApiRequest> => {
+        requestMiddleware: async (request: any): Promise<any> => {
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
@@ -74,10 +74,7 @@ export default class OpenApiWrapper {
 
           return request;
         },
-        responseMiddleware: async (
-          request: ApiRequest,
-          response: ApiResponse,
-        ): Promise<ApiResponse> => {
+        responseMiddleware: async (request: any, response: any): Promise<any> => {
           requestLogger.log({
             title: 'ResponseLogger',
             level: 'INFO',
@@ -90,10 +87,7 @@ export default class OpenApiWrapper {
           return response.withCorrelationId(correlationId);
         },
 
-        errorMiddleware: async (
-          request: ApiRequest,
-          error: Exception | Error,
-        ): Promise<ApiResponse> => {
+        errorMiddleware: async (request: any, error: any): Promise<any> => {
           const { correlationId } = this;
           this.clearContext();
           const serializedError = serializeObject(error, true);

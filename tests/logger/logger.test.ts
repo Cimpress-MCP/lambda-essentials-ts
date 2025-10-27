@@ -23,7 +23,6 @@ describe('log message', () => {
       },
     };
     expect(logFunction).toHaveBeenCalledWith(JSON.stringify(receivedObject, null, 2));
-
   });
 
   test('test truncating TOKEN', () => {
