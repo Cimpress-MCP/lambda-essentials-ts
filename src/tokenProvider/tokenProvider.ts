@@ -1,5 +1,6 @@
 import jwtManager from 'jsonwebtoken';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import HttpClient from '../httpClient/httpClient';
 
 export default abstract class TokenProvider {
   private httpClient: TokenProviderHttpClient;
@@ -12,7 +13,15 @@ export default abstract class TokenProvider {
    * Create a new Instance of the TokenProvider
    */
   protected constructor(options: TokenProviderOptions) {
-    this.httpClient = options.httpClient ?? axios.create();
+    this.httpClient =
+      options.httpClient ??
+      new HttpClient({
+        enableCache: false,
+        enableRetry: true,
+        retryOptions: {
+          retry: 3,
+        },
+      });
     this.configuration = options.tokenConfiguration;
   }
 
@@ -71,7 +80,8 @@ export interface Auth0Secret {
 
 export interface TokenProviderOptions {
   /**
-   * Either an Axios instance or an @atsquad/httpclient instance, by default it creates an axios instance
+   * Either an Axios instance or an @atsquad/httpclient instance, by default it creates an @atsquad/httpclient instance without cache
+   * with retries
    */
   httpClient?: TokenProviderHttpClient;
   /**
