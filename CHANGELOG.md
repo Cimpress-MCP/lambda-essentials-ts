@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 - Add 429 status code mapping
 - Changed logging format. Removed the inner `message` object.
+- Update packages
+- Use axios-cache-interceptor instead of axios-cache-adapter
 
 ## [6.1.1] - 2025-10-27
 

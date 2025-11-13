@@ -67,7 +67,7 @@ export function serializeAxiosError(error: AxiosError): SerializedAxiosError | u
 
   return {
     status: originalStatusCode ?? status, // Propagate original status code of ClientException
-    details, // Prevent wrapping of Exception
+    details,
     message,
   };
 }
