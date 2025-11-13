@@ -1,8 +1,9 @@
-import { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import * as uuid from 'uuid';
 import md5 from 'md5';
 import { InternalException } from '../../src';
 import HttpClient from '../../src/httpClient/httpClient';
+import MockAdapter from 'axios-mock-adapter';
 
 describe('HttpClient', () => {
   describe('createHeadersWithResolvedToken()', () => {
@@ -121,6 +122,37 @@ describe('HttpClient', () => {
       const result = HttpClient.generateCacheKey(request);
       expect(uuid.validate(result.split('/')[0])).toBeTruthy();
       expect(result.split('/')[1]).toEqual('testUrl');
+    });
+  });
+
+  describe('HttpClient caching', () => {
+    it('should serve subsequent requests from cache when requests are made in quick succession', async () => {
+      const axiosInstance = axios.create();
+
+      const mockAdapter = new MockAdapter(axiosInstance);
+      const mockResponse = 'test-response';
+
+      mockAdapter.onGet('https://api.example.com/data').reply(200, mockResponse);
+
+      const httpClient = new HttpClient({
+        client: axiosInstance,
+        enableCache: true,
+        logFunction: jest.fn(),
+      });
+
+      const url = 'https://api.example.com/data';
+
+      const [response1, response2, response3] = await Promise.all([
+        httpClient.get(url),
+        httpClient.get(url),
+        httpClient.get(url),
+      ]);
+
+      expect(mockAdapter.history.get.length).toBe(1);
+
+      expect(response1.data).toEqual(mockResponse);
+      expect(response2.data).toEqual(mockResponse);
+      expect(response3.data).toEqual(mockResponse);
     });
   });
 });

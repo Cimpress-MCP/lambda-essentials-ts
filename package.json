@@ -42,6 +42,7 @@
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/newrelic": "^9.14.8",
+    "axios-mock-adapter": "^2.1.0",
     "eslint": "^8.57.1",
     "eslint-config-cimpress-atsquad": "^2.2.0-beta",
     "husky": "^9.1.7",
