@@ -1,11 +1,12 @@
 import { orionCorrelationIdRoot } from '../shared';
+import { AxiosHeaderValue } from 'axios';
 
 export class ApiResponse<T = any> {
   public readonly body?: T;
 
   public readonly statusCode: number;
 
-  public readonly headers: Record<string, string>;
+  public readonly headers: { [key: string]: AxiosHeaderValue };
 
   constructor(statusCode: number, body?: T, headers?: Record<string, string>) {
     this.body = body;

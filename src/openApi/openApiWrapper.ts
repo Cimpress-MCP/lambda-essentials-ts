@@ -1,11 +1,10 @@
 import OpenApi from 'openapi-factory';
 import * as uuid from 'uuid';
-import { AuthorizerContext } from './apiRequestModel';
+import { ApiRequest, AuthorizerContext } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
-import { OpenApiModel } from './openApiModel';
 
 export interface OpenApiWrapperConfig {
   enableNewRelicTracking: boolean;
@@ -16,7 +15,7 @@ export default class OpenApiWrapper {
 
   private readonly cleared = 'cleared';
 
-  public api: OpenApiModel;
+  public api: OpenApi;
 
   private userToken: string = this.notSet;
 
@@ -34,10 +33,11 @@ export default class OpenApiWrapper {
       this.newrelic = require('newrelic');
     }
 
-    // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {
-        requestMiddleware: async (request: any): Promise<any> => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        requestMiddleware: async (event: object, _context: object): Promise<unknown> => {
+          const request = event as ApiRequest;
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
@@ -74,7 +74,8 @@ export default class OpenApiWrapper {
 
           return request;
         },
-        responseMiddleware: async (request: any, response: any): Promise<any> => {
+        responseMiddleware: async (_request: object, responseObj: object): Promise<unknown> => {
+          const response = responseObj as ApiResponse;
           requestLogger.log({
             title: 'ResponseLogger',
             level: 'INFO',
@@ -87,7 +88,8 @@ export default class OpenApiWrapper {
           return response.withCorrelationId(correlationId);
         },
 
-        errorMiddleware: async (request: any, error: any): Promise<any> => {
+        errorMiddleware: async (_event: object, errorObj: object): Promise<unknown> => {
+          const error = errorObj as Exception | Error;
           const { correlationId } = this;
           this.clearContext();
           const serializedError = serializeObject(error, true);
