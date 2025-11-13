@@ -11,6 +11,7 @@ export class ClientException extends Exception {
     403: 403,
     404: 422,
     422: 422,
+    429: 429,
   };
 
   constructor(

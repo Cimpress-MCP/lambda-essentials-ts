@@ -56,7 +56,7 @@ export default class Logger {
 
     const payload = {
       invocationId: this.invocationId,
-      message: messageAsObject,
+      ...messageAsObject,
     };
 
     const truncateToken = (innerPayload: string): string => {
@@ -73,11 +73,9 @@ export default class Logger {
     if (stringifiedPayload.length >= 32768) {
       const replacementPayload = {
         invocationId: this.invocationId,
-        message: {
-          title: 'Payload too large',
-          fields: Object.keys(payload),
-          truncatedPayload: stringifiedPayload.substring(0, 10000),
-        },
+        title: 'Payload too large',
+        fields: Object.keys(payload),
+        truncatedPayload: stringifiedPayload.substring(0, 10000),
       };
       stringifiedPayload = stringify(replacementPayload, replacer, this.jsonSpace);
     }
