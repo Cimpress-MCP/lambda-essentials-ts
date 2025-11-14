@@ -4627,10 +4627,10 @@ onetime@^7.0.0:
   dependencies:
     mimic-function "^5.0.0"
 
-openapi-factory@5.4.88:
-  version "5.4.88"
-  resolved "https://registry.yarnpkg.com/openapi-factory/-/openapi-factory-5.4.88.tgz#5197d1638a3715c62fd83d43677a5c30dc6711cb"
-  integrity sha512-uwRTY9vqtLObcc+gQrO54Zvllh2LZxUCzyxhvojMEhMmO+O4q0d6oYXPLhzJwBTTvEaoKzoRRalzy6pGJr612A==
+openapi-factory@5.4.60:
+  version "5.4.60"
+  resolved "https://registry.yarnpkg.com/openapi-factory/-/openapi-factory-5.4.60.tgz#c4bf3436c11c96d1387e0f6e24534f5310e014b6"
+  integrity sha512-nfQVI6CBUsyhr7ax9dULveQ8NxB8nxGxPFHDEEYfEh5cMXHn9rdQ98fuHDa+53Z0iehPUjptePNLbh83zHiXuQ==
 
 optionator@^0.9.3:
   version "0.9.4"

@@ -12,11 +12,17 @@ export default class Logger {
 
   private readonly jsonSpace: number;
 
+  private readonly payloadLimit: number;
+
   private staticData: any;
 
   constructor(configuration?: LoggerConfiguration) {
     this.logFunction = configuration?.logFunction ?? console.log;
     this.jsonSpace = configuration?.jsonSpace ?? 2;
+    this.payloadLimit =
+      !configuration?.payloadLimit || configuration?.payloadLimit < 10000
+        ? 32768
+        : configuration?.payloadLimit;
 
     this.invocationId = 'none';
   }
@@ -24,6 +30,7 @@ export default class Logger {
   /**
    * Create a new invocation which will end up setting the additional invocation metadata for the request, which will be used when logging.
    * @param staticData Any static data that are assigned to every log message. Typical might be an environment parameter or version number.
+   * @param invocationId
    */
   startInvocation(staticData?: any, invocationId?: string): void {
     this.staticData = staticData;
@@ -69,13 +76,12 @@ export default class Logger {
     const replacer = (key, value) => (isError(value) ? Logger.errorToObject(value) : value);
     let stringifiedPayload = truncateToken(stringify(payload, replacer, this.jsonSpace));
     stringifiedPayload = redactSecret(stringifiedPayload);
-    // https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html 256KB => 32768 characters
-    if (stringifiedPayload.length >= 32768) {
+    if (stringifiedPayload.length >= this.payloadLimit) {
       const replacementPayload = {
         invocationId: this.invocationId,
         title: 'Payload too large',
         fields: Object.keys(payload),
-        truncatedPayload: stringifiedPayload.substring(0, 10000),
+        truncatedPayload: stringifiedPayload.substring(0, this.payloadLimit - 3000),
       };
       stringifiedPayload = stringify(replacementPayload, replacer, this.jsonSpace);
     }
@@ -102,6 +108,14 @@ export interface LoggerConfiguration {
    * the number of spaces that are used then stringifying the message.
    */
   jsonSpace?: number;
+
+  /**
+   * the limit of a stringified payload in characters above which the payload will be truncated.
+   * 3000 characters are reserved
+   * @min 10000
+   * @default 32768
+   */
+  payloadLimit?: number;
 }
 
 export interface SuggestedLogObject {

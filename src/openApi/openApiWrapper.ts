@@ -5,6 +5,7 @@ import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
+import { OpenApiModel } from './openApiModel';
 
 export interface OpenApiWrapperConfig {
   enableNewRelicTracking: boolean;
@@ -15,7 +16,7 @@ export default class OpenApiWrapper {
 
   private readonly cleared = 'cleared';
 
-  public api: OpenApi;
+  public api: OpenApiModel;
 
   private userToken: string = this.notSet;
 
@@ -33,11 +34,10 @@ export default class OpenApiWrapper {
       this.newrelic = require('newrelic');
     }
 
+    // @ts-ignore Later Use the options Type from OpenApiFactory
     this.api = new OpenApi(
       {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        requestMiddleware: async (event: object, _context: object): Promise<unknown> => {
-          const request = event as ApiRequest;
+        requestMiddleware: async (request: ApiRequest): Promise<ApiRequest> => {
           const correlationId = this.generateCorrelationId(request.headers);
           requestLogger.startInvocation(null, correlationId);
 
@@ -74,8 +74,10 @@ export default class OpenApiWrapper {
 
           return request;
         },
-        responseMiddleware: async (_request: object, responseObj: object): Promise<unknown> => {
-          const response = responseObj as ApiResponse;
+        responseMiddleware: async (
+          request: ApiRequest,
+          response: ApiResponse,
+        ): Promise<ApiResponse> => {
           requestLogger.log({
             title: 'ResponseLogger',
             level: 'INFO',
@@ -88,8 +90,10 @@ export default class OpenApiWrapper {
           return response.withCorrelationId(correlationId);
         },
 
-        errorMiddleware: async (_event: object, errorObj: object): Promise<unknown> => {
-          const error = errorObj as Exception | Error;
+        errorMiddleware: async (
+          request: ApiRequest,
+          error: Exception | Error,
+        ): Promise<ApiResponse> => {
           const { correlationId } = this;
           this.clearContext();
           const serializedError = serializeObject(error, true);

@@ -39,7 +39,6 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
     : JSON.parse(JSON.stringify(modObj));
 }
 
-// eslint-disable-next-line complexity
 export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
   if (!error.response) {
     return {
@@ -48,27 +47,11 @@ export function serializeAxiosError(error: AxiosError): SerializedAxiosError | u
     };
   }
 
-  const { status } = error.response;
-  const data: unknown = error.response.data as unknown;
-  const originalStatusCode =
-    data && typeof data === 'object' && 'originalStatusCode' in data
-      ? (data as any).originalStatusCode
-      : undefined;
-  const details =
-    data &&
-    typeof data === 'object' &&
-    'details' in data &&
-    (data as any).details &&
-    Object.keys((data as any).details).length > 0
-      ? (data as any).details
-      : data;
-  const message =
-    data && typeof data === 'object' && 'message' in data ? (data as any).message : undefined;
-
+  const { status, data } = error.response as any;
   return {
-    status: originalStatusCode ?? status, // Propagate original status code of ClientException
-    details,
-    message,
+    status: data.originalStatusCode ?? status, // Propagate original status code of ClientException
+    details: data.details && Object.keys(data.details).length > 0 ? data.details : data, // Prevent wrapping of Exception
+    message: data.message,
   };
 }
 

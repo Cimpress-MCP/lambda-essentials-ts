@@ -13,7 +13,6 @@
     "noImplicitAny": false,
     "preserveConstEnums": true,
     "newLine": "lf",
-    "skipLibCheck": true,
     "types": ["node", "jest"]
   },
   "include": ["src/**/*.ts"]

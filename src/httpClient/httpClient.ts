@@ -63,7 +63,7 @@ export default class HttpClient {
         // Serve stale cache on error
         staleIfError: true,
         // Use custom cache key to include auth, url, params and body hash
-        generateKey: (req) => HttpClient.generateCacheKey(req as AxiosRequestConfig),
+        generateKey: (req) => HttpClient.generateCacheKey(req),
         // Allow overriding defaults via provided options
         ...options?.cacheOptions,
       });
@@ -226,7 +226,7 @@ export default class HttpClient {
     }
 
     return {
-      ...(headers || {}),
+      ...headers,
       ...newHeaders,
     };
   }
