@@ -36,6 +36,7 @@
     "jsonwebtoken": "9.0.2",
     "md5": "~2.3.0",
     "openapi-factory": "5.4.60",
+    "redis": "^5.9.0",
     "retry-axios": "~3.2.1",
     "uuid": "~11.1.0"
   },
