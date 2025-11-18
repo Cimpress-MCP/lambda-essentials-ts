@@ -66,8 +66,8 @@ export default class HttpClient {
       setupCache(this.client, {
         // 5 minutes TTL
         ttl: 5 * 60 * 1000,
-        // Ignore cache-control headers in favor of static TTL
-        interpretHeader: false,
+        // Respect cache-control headers and have ttl as a fallback https://axios-cache-interceptor.js.org/config/request-specifics#cache-interpretheader
+        interpretHeader: true,
         // Serve stale cache on error
         staleIfError: true,
         // Use custom cache key to include auth, url, params and body hash
