@@ -36,13 +36,13 @@
     "jsonwebtoken": "9.0.2",
     "md5": "~2.3.0",
     "openapi-factory": "5.4.60",
-    "redis": "^5.9.0",
     "retry-axios": "~3.2.1",
     "uuid": "~11.1.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/newrelic": "^9.14.8",
+    "redis": "^5.9.0",
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^8.57.1",
     "eslint-config-cimpress-atsquad": "^2.2.0-beta",

@@ -1,5 +1,6 @@
 import { buildStorage, canStale } from 'axios-cache-interceptor';
 import type { StorageValue } from 'axios-cache-interceptor';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { createClient } from 'redis';
 
 export default function createRedisStorage(client: ReturnType<typeof createClient>) {
