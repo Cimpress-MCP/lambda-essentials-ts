@@ -28,7 +28,6 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
   let modObj = obj;
   if (obj && typeof obj === 'object') {
     modObj = Object.getOwnPropertyNames(obj).reduce((map, key) => {
-      // eslint-disable-next-line no-param-reassign
       map[key] = obj[key];
       return map;
     }, {});

@@ -1,7 +1,6 @@
 import * as uuid from 'uuid';
 import axios, {
   AxiosError,
-  AxiosHeaders,
   AxiosHeaderValue,
   AxiosInstance,
   AxiosRequestConfig,
@@ -217,11 +216,7 @@ export default class HttpClient {
    * Resolves the token with the token provider and adds it to the headers
    */
   async createHeadersWithResolvedToken(
-    headers?:
-      | RawAxiosRequestHeaders
-      | AxiosHeaders
-      | { [key: string]: AxiosHeaderValue }
-      | Record<string, string>,
+    headers?: RawAxiosRequestHeaders | { [key: string]: AxiosHeaderValue } | Record<string, string>,
   ): Promise<{ [p: string]: AxiosHeaderValue }> {
     const newHeaders: { [key: string]: AxiosHeaderValue } = {};
     if (this.correlationIdResolverFunction) {
