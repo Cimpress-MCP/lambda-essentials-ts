@@ -1,5 +1,13 @@
 import * as uuid from 'uuid';
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  AxiosHeaderValue,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  RawAxiosRequestHeaders,
+} from 'axios';
 import * as rax from 'retry-axios';
 import { RetryConfig } from 'retry-axios';
 import md5 from 'md5';
@@ -208,8 +216,14 @@ export default class HttpClient {
   /**
    * Resolves the token with the token provider and adds it to the headers
    */
-  async createHeadersWithResolvedToken(headers: any = {}): Promise<any> {
-    const newHeaders: Record<string, string> = {};
+  async createHeadersWithResolvedToken(
+    headers?:
+      | RawAxiosRequestHeaders
+      | AxiosHeaders
+      | { [key: string]: AxiosHeaderValue }
+      | Record<string, string>,
+  ): Promise<{ [p: string]: AxiosHeaderValue }> {
+    const newHeaders: { [key: string]: AxiosHeaderValue } = {};
     if (this.correlationIdResolverFunction) {
       newHeaders[orionCorrelationIdRoot] = this.correlationIdResolverFunction();
     }
@@ -226,7 +240,7 @@ export default class HttpClient {
     }
 
     return {
-      ...headers,
+      ...(headers as { [key: string]: AxiosHeaderValue }),
       ...newHeaders,
     };
   }
