@@ -5,9 +5,9 @@ import stringify from 'fast-safe-stringify';
 import isError from 'is-error';
 import { redactSecret } from '../util';
 
-const defaultPayloadLimit = 32768;
+const DEFAULT_PAYLOAD_LIMIT = 32768;
 
-const minPayloadLimit = 10000;
+const MIN_PAYLOAD_LIMIT = 10000;
 
 export default class Logger {
   public invocationId: string;
@@ -24,9 +24,9 @@ export default class Logger {
     this.logFunction = configuration?.logFunction ?? console.log;
     this.jsonSpace = configuration?.jsonSpace ?? 2;
     this.payloadLimit = !configuration?.payloadLimit
-      ? defaultPayloadLimit
-      : configuration?.payloadLimit < minPayloadLimit
-      ? minPayloadLimit
+      ? DEFAULT_PAYLOAD_LIMIT
+      : configuration?.payloadLimit < MIN_PAYLOAD_LIMIT
+      ? MIN_PAYLOAD_LIMIT
       : configuration.payloadLimit;
 
     this.invocationId = 'none';
