@@ -3,17 +3,19 @@ import type { StorageValue } from 'axios-cache-interceptor';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { createClient } from 'redis';
 
+const keyPrefix = 'axios-cache-';
+
 export default function createRedisStorage(client: ReturnType<typeof createClient>) {
   // source https://axios-cache-interceptor.js.org/guide/storages#node-redis-storage
   return buildStorage({
     async find(key) {
-      const result = await client.get(`axios-cache-${key}`);
+      const result = await client.get(`${keyPrefix}${key}`);
       return result ? (JSON.parse(result) as StorageValue) : undefined;
     },
 
     // eslint-disable-next-line complexity
     async set(key, value, req) {
-      await client.set(`axios-cache-${key}`, JSON.stringify(value), {
+      await client.set(`${keyPrefix}${key}`, JSON.stringify(value), {
         PXAT:
           value.state === 'loading'
             ? Date.now() + (req?.cache && typeof req.cache.ttl === 'number' ? req.cache.ttl : 60000)
@@ -25,7 +27,7 @@ export default function createRedisStorage(client: ReturnType<typeof createClien
     },
 
     async remove(key) {
-      await client.del(`axios-cache-${key}`);
+      await client.del(`${keyPrefix}${key}`);
     },
   });
 }

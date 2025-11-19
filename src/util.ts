@@ -38,7 +38,7 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
     : JSON.parse(JSON.stringify(modObj));
 }
 
-export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
+export function serializeAxiosError(error: AxiosError<any>): SerializedAxiosError | undefined {
   if (!error.response) {
     return {
       status: 500,
@@ -46,7 +46,7 @@ export function serializeAxiosError(error: AxiosError): SerializedAxiosError | u
     };
   }
 
-  const { status, data } = error.response as any;
+  const { status, data } = error.response;
   return {
     status: data.originalStatusCode ?? status, // Propagate original status code of ClientException
     details: data.details && Object.keys(data.details).length > 0 ? data.details : data, // Prevent wrapping of Exception
