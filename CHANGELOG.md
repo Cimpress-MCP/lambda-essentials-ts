@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [7.0.0-beta] - 2025-11-14
+
+### Changed
+
+- Add 429 status code mapping
+- Changed logging format. Removed the inner `message` object.
+- Update packages
+- Use axios-cache-interceptor instead of axios-cache-adapter
+
 ## [6.1.1] - 2025-10-27
 
 ### Changed

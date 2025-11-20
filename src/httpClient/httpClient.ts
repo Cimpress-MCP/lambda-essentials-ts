@@ -1,13 +1,12 @@
 import * as uuid from 'uuid';
-import { URL } from 'url';
 import axios, {
-  AxiosAdapter,
   AxiosError,
+  AxiosHeaderValue,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
+  RawAxiosRequestHeaders,
 } from 'axios';
-import { IAxiosCacheAdapterOptions, setupCache } from 'axios-cache-adapter';
 import * as rax from 'retry-axios';
 import { RetryConfig } from 'retry-axios';
 import md5 from 'md5';
@@ -15,7 +14,7 @@ import { safeJwtCanonicalIdParse, safeJsonParse, serializeAxiosError } from '../
 import { InternalException } from '../exceptions/internalException';
 import { ClientException } from '../exceptions/clientException';
 import { orionCorrelationIdRoot } from '../shared';
-import { createDebounceRequestAdapter } from './deduplicateRequestAdapter';
+import { CacheOptions, setupCache } from 'axios-cache-interceptor';
 
 const invalidToken: string = 'Invalid token';
 
@@ -60,29 +59,22 @@ export default class HttpClient {
     this.enableRetry = options?.enableRetry ?? false;
     this.timeout = options?.timeout;
     this.clientExceptionStatusCodeMapOverride = options?.clientExceptionStatusCodeMapOverride;
-    this.client =
-      options?.client ??
-      axios.create({
-        adapter: (() => {
-          let adapters = axios.defaults.adapter as AxiosAdapter;
-          if (this.enableCache) {
-            const cache = setupCache({
-              maxAge: 5 * 60 * 1000, // all items are cached for 5 minutes
-              readHeaders: false, // ignore cache control headers in favor of the static 5 minutes
-              readOnError: true,
-              exclude: {
-                query: false, // also cache requests with query parameters
-              },
-              ...options?.cacheOptions, // allow to overwrite the defaults except of cache-key
-              key: (req) => HttpClient.generateCacheKey(req),
-            });
+    this.client = options?.client ?? axios.create();
 
-            // debounce concurrent calls with the same cacheKey so that only one HTTP request is made
-            adapters = createDebounceRequestAdapter(cache.adapter, HttpClient.generateCacheKey);
-          }
-          return adapters;
-        })(),
+    if (this.enableCache) {
+      setupCache(this.client, {
+        // 5 minutes TTL
+        ttl: 5 * 60 * 1000,
+        // Respect cache-control headers and have ttl as a fallback https://axios-cache-interceptor.js.org/config/request-specifics#cache-interpretheader
+        interpretHeader: true,
+        // Serve stale cache on error
+        staleIfError: true,
+        // Use custom cache key to include auth, url, params and body hash
+        generateKey: (req) => HttpClient.generateCacheKey(req),
+        // Allow overriding defaults via provided options
+        ...options?.cacheOptions,
       });
+    }
 
     if (this.enableRetry) {
       this.client.defaults.raxConfig = {
@@ -224,15 +216,15 @@ export default class HttpClient {
    * Resolves the token with the token provider and adds it to the headers
    */
   async createHeadersWithResolvedToken(
-    headers: Record<string, string> = {},
-  ): Promise<Record<string, string>> {
-    const newHeaders: Record<string, string> = {};
+    headers?: RawAxiosRequestHeaders | { [key: string]: AxiosHeaderValue } | Record<string, string>,
+  ): Promise<{ [p: string]: AxiosHeaderValue }> {
+    const newHeaders: { [key: string]: AxiosHeaderValue } = {};
     if (this.correlationIdResolverFunction) {
       newHeaders[orionCorrelationIdRoot] = this.correlationIdResolverFunction();
     }
 
     if (this.tokenResolverFunction) {
-      if (headers.Authorization) {
+      if (headers && headers.Authorization) {
         throw new InternalException(
           'Authorization header already specified, please create a new HttpClient with a different (or without a) tokenResolver',
         );
@@ -243,7 +235,7 @@ export default class HttpClient {
     }
 
     return {
-      ...headers,
+      ...(headers as { [key: string]: AxiosHeaderValue }),
       ...newHeaders,
     };
   }
@@ -349,10 +341,10 @@ export interface HttpClientOptions {
    */
   enableCache?: boolean;
   /**
-   * Cache options
-   * @link https://github.com/RasCarlito/axios-cache-adapter/blob/master/axios-cache-adapter.d.ts#L26
+   * Cache options (global defaults for axios-cache-interceptor)
+   * @link https://axios-cache-interceptor.js.org/config
    */
-  cacheOptions?: IAxiosCacheAdapterOptions;
+  cacheOptions?: CacheOptions;
   /**
    * Enable automatic retries
    */

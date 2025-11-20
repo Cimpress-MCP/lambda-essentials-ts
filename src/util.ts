@@ -28,7 +28,6 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
   let modObj = obj;
   if (obj && typeof obj === 'object') {
     modObj = Object.getOwnPropertyNames(obj).reduce((map, key) => {
-      // eslint-disable-next-line no-param-reassign
       map[key] = obj[key];
       return map;
     }, {});
@@ -39,7 +38,7 @@ export function serializeObject(obj: unknown, redact?: boolean): object {
     : JSON.parse(JSON.stringify(modObj));
 }
 
-export function serializeAxiosError(error: AxiosError): SerializedAxiosError | undefined {
+export function serializeAxiosError(error: AxiosError<any>): SerializedAxiosError | undefined {
   if (!error.response) {
     return {
       status: 500,

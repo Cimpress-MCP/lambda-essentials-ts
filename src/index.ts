@@ -31,6 +31,7 @@ import { InvalidDataException } from './exceptions/invalidDataException';
 import { NotFoundException } from './exceptions/notFoundException';
 import { ValidationException } from './exceptions/validationException';
 import { serializeObject, serializeAxiosError } from './util';
+import RedisStorage from './httpClient/redisStorage';
 
 export {
   Logger,
@@ -50,6 +51,7 @@ export {
   ClientException,
   serializeObject,
   serializeAxiosError,
+  RedisStorage,
 };
 
 export type {

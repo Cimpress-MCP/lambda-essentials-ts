@@ -16,14 +16,11 @@ describe('log message', () => {
     testLogger.log(logObjectWithSecret);
     const receivedObject: SuggestedLogObject = {
       invocationId: 'none',
-      message: {
-        title: 'One secret',
-        level: 'DEBUG',
-        data: '{"client_id":"baconClientId","client_secret":"<REDACTED>","audience":"https://api.banana.io/","grant_type":"client_credentials"}',
-      },
+      title: 'One secret',
+      level: 'DEBUG',
+      data: '{"client_id":"baconClientId","client_secret":"<REDACTED>","audience":"https://api.banana.io/","grant_type":"client_credentials"}',
     };
     expect(logFunction).toHaveBeenCalledWith(JSON.stringify(receivedObject, null, 2));
-
   });
 
   test('test truncating TOKEN', () => {
@@ -35,11 +32,9 @@ describe('log message', () => {
     testLogger.log(logObjectWithToken);
     const receivedObject: SuggestedLogObject = {
       invocationId: 'none',
-      message: {
-        title: 'One TOKEN',
-        level: 'DEBUG',
-        data: '{"client_id":"baconClientId","TOKEN":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.<sig>","audience":"https://api.banana.io/","grant_type":"client_credentials"}',
-      },
+      title: 'One TOKEN',
+      level: 'DEBUG',
+      data: '{"client_id":"baconClientId","TOKEN":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.<sig>","audience":"https://api.banana.io/","grant_type":"client_credentials"}',
     };
     expect(logFunction).toHaveBeenCalledWith(JSON.stringify(receivedObject, null, 2));
   });
@@ -53,11 +48,9 @@ describe('log message', () => {
     testLogger.log(logObjectWithToken);
     const receivedObject: SuggestedLogObject = {
       invocationId: 'none',
-      message: {
-        title: 'One TOKEN',
-        level: 'DEBUG',
-        data: '{"client_id":"baconClientId","client_secret":"<REDACTED>","TOKEN":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.<sig>","audience":"https://api.banana.io/","grant_type":"client_credentials"}',
-      },
+      title: 'One TOKEN',
+      level: 'DEBUG',
+      data: '{"client_id":"baconClientId","client_secret":"<REDACTED>","TOKEN":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.<sig>","audience":"https://api.banana.io/","grant_type":"client_credentials"}',
     };
     expect(logFunction).toHaveBeenCalledWith(JSON.stringify(receivedObject, null, 2));
   });
