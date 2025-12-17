@@ -1,6 +1,7 @@
 import jwtManager from 'jsonwebtoken';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import HttpClient from '../httpClient/httpClient';
+import Logger from '../logger/logger';
 
 export default abstract class TokenProvider {
   private httpClient: TokenProviderHttpClient;
@@ -16,6 +17,7 @@ export default abstract class TokenProvider {
     this.httpClient =
       options.httpClient ??
       new HttpClient({
+        logFunction: (msg) => new Logger().log(msg),
         enableCache: false,
         enableRetry: true,
         retryOptions: {
