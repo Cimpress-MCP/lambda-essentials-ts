@@ -36,7 +36,4 @@ jobs:
 
       - name: Publish if version has been updated
         run: yarn npm publish --access public
-        with:
-          tag_name: 'v%s'
-          tag_message: 'v%s'
-          commit_pattern: "Release (\\S+)"
+        if: github.ref_type == 'tag'
