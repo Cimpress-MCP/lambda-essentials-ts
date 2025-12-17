@@ -23,6 +23,34 @@ describe('log message', () => {
     expect(logFunction).toHaveBeenCalledWith(JSON.stringify(receivedObject, null, 2));
   });
 
+  test('test redacting secret from our http client', () => {
+    const logObjectWithSecret: SuggestedLogObject = {
+      title: 'One secret',
+      level: 'DEBUG',
+      bacon: {
+        request: {
+          client_id: 'baconClientId',
+          client_secret: 'E5BuCZ8AuBpnDfB25dhgftyuvBcBwDiBBCC5DjBGBeBfjD5BeBqhBFBQDGDp_gSw_',
+          audience: 'https://api.banana.io/',
+          grant_type: 'client_credentials',
+        },
+      },
+    };
+    testLogger.log(logObjectWithSecret);
+    const receivedObject: SuggestedLogObject = {
+      invocationId: 'none',
+      title: 'One secret',
+      level: 'DEBUG',
+      request: {
+        client_id: 'baconClientId',
+        client_secret: '<REDACTED>',
+        audience: 'https://api.banana.io/',
+        grant_type: 'client_credentials',
+      },
+    };
+    expect(logFunction).toHaveBeenCalledWith(JSON.stringify(receivedObject, null, 2));
+  });
+
   test('test truncating TOKEN', () => {
     const logObjectWithToken: SuggestedLogObject = {
       title: 'One TOKEN',
