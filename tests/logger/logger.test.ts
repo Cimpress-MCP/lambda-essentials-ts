@@ -27,13 +27,11 @@ describe('log message', () => {
     const logObjectWithSecret: SuggestedLogObject = {
       title: 'One secret',
       level: 'DEBUG',
-      bacon: {
-        request: {
-          client_id: 'baconClientId',
-          client_secret: 'E5BuCZ8AuBpnDfB25dhgftyuvBcBwDiBBCC5DjBGBeBfjD5BeBqhBFBQDGDp_gSw_',
-          audience: 'https://api.banana.io/',
-          grant_type: 'client_credentials',
-        },
+      request: {
+        client_id: 'baconClientId',
+        client_secret: 'E5BuCZ8AuBpnDfB25dhgftyuvBcBwDiBBCC5DjBGBeBfjD5BeBqhBFBQDGDp_gSw_',
+        audience: 'https://api.banana.io/',
+        grant_type: 'client_credentials',
       },
     };
     testLogger.log(logObjectWithSecret);
