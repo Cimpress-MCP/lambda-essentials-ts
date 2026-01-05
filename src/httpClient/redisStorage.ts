@@ -7,9 +7,9 @@ const KEY_PREFIX = 'axios-cache-';
 
 const MIN_TTL = 60000;
 
-export default function createRedisStorage(client: ReturnType<typeof createClient>) {
+export default async function createRedisStorage(client: ReturnType<typeof createClient>) {
   // source https://axios-cache-interceptor.js.org/guide/storages#node-redis-storage
-  return buildStorage({
+  const storage = buildStorage({
     async find(key) {
       const result = await client.get(`${KEY_PREFIX}${key}`);
       return result ? (JSON.parse(result) as StorageValue) : undefined;
@@ -38,4 +38,8 @@ export default function createRedisStorage(client: ReturnType<typeof createClien
       await client.del(`${KEY_PREFIX}${key}`);
     },
   });
+
+  if (!client.isReady) await client.connect();
+
+  return storage;
 }
