@@ -45,7 +45,7 @@
     "redis": "^5.9.0",
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^8.57.1",
-    "eslint-config-cimpress-atsquad": "^2.2.0-beta",
+    "eslint-config-cimpress-atsquad": "^2.2.3",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "lint-staged": "^15.5.2",
