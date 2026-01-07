@@ -5,7 +5,7 @@ const KEY_PREFIX = 'axios-cache-';
 
 const MIN_TTL = 60000;
 
-export default async function createRedisStorage(redisEndpoint: string) {
+export default function createRedisStorage(redisEndpoint: string) {
   // eslint-disable-next-line import/no-extraneous-dependencies
   const redis = require('redis');
 
