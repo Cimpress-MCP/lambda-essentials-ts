@@ -1,13 +1,15 @@
 import { buildStorage, canStale } from 'axios-cache-interceptor';
 import type { StorageValue } from 'axios-cache-interceptor';
-import { createClient } from 'redis';
 
 const KEY_PREFIX = 'axios-cache-';
 
 const MIN_TTL = 60000;
 
 export default async function createRedisStorage(redisEndpoint: string) {
-  const client = createClient({ url: redisEndpoint });
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const redis = require('redis');
+
+  const client = redis.createClient({ url: redisEndpoint });
   await client.connect();
 
   // source https://axios-cache-interceptor.js.org/guide/storages#node-redis-storage
