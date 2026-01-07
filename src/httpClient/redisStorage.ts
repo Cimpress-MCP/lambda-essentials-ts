@@ -10,17 +10,18 @@ export default async function createRedisStorage(redisEndpoint: string) {
   const redis = require('redis');
 
   const client = redis.createClient({ url: redisEndpoint });
-  await client.connect();
 
   // source https://axios-cache-interceptor.js.org/guide/storages#node-redis-storage
   return buildStorage({
     async find(key) {
+      if (!client.isReady) await client.connect();
       const result = await client.get(`${KEY_PREFIX}${key}`);
       return result ? (JSON.parse(result) as StorageValue) : undefined;
     },
 
     // eslint-disable-next-line complexity
     async set(key, value, req) {
+      if (!client.isReady) await client.connect();
       await client.set(`${KEY_PREFIX}${key}`, JSON.stringify(value), {
         PXAT:
           // We don't want to keep indefinitely values in the storage if
@@ -39,6 +40,7 @@ export default async function createRedisStorage(redisEndpoint: string) {
     },
 
     async remove(key) {
+      if (!client.isReady) await client.connect();
       await client.del(`${KEY_PREFIX}${key}`);
     },
   });
