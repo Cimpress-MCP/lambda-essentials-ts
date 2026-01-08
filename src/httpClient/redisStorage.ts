@@ -1,22 +1,32 @@
 import { buildStorage, canStale } from 'axios-cache-interceptor';
 import type { StorageValue } from 'axios-cache-interceptor';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { createClient } from 'redis';
 
 const KEY_PREFIX = 'axios-cache-';
 
 const MIN_TTL = 60000;
 
-export default function createRedisStorage(client: ReturnType<typeof createClient>) {
+export default function createRedisStorage(redisEndpoint: string) {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const redis = require('redis');
+
+  const client = redis.createClient({ url: redisEndpoint });
+
   // source https://axios-cache-interceptor.js.org/guide/storages#node-redis-storage
   return buildStorage({
     async find(key) {
+      if (!client.isReady) {
+        await client.connect();
+      }
       const result = await client.get(`${KEY_PREFIX}${key}`);
       return result ? (JSON.parse(result) as StorageValue) : undefined;
     },
 
     // eslint-disable-next-line complexity
     async set(key, value, req) {
+      if (!client.isReady) {
+        await client.connect();
+      }
+
       await client.set(`${KEY_PREFIX}${key}`, JSON.stringify(value), {
         PXAT:
           // We don't want to keep indefinitely values in the storage if
@@ -35,6 +45,9 @@ export default function createRedisStorage(client: ReturnType<typeof createClien
     },
 
     async remove(key) {
+      if (!client.isReady) {
+        await client.connect();
+      }
       await client.del(`${KEY_PREFIX}${key}`);
     },
   });
