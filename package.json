@@ -1,6 +1,6 @@
 {
   "name": "lambda-essentials-ts",
-  "version": "7.0.4",
+  "version": "7.0.5",
   "description": "A selection of the finest modules supporting authorization, API routing, error handling, logging and sending HTTP requests.",
   "main": "lib/index.js",
   "private": false,
@@ -51,8 +51,7 @@
     "prettier": "^2.8.8",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "redis": "^5.10.0"
+    "typescript": "^5.9.3"
   },
   "eslintConfig": {
     "extends": "cimpress-atsquad"
@@ -80,6 +79,7 @@
     "node": ">=20.0.0"
   },
   "peerDependencies": {
-    "newrelic": "^12.0.0"
+    "newrelic": "^12.0.0",
+    "ioredis": "^5.9.1"
   }
 }
