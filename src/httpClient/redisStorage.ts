@@ -5,21 +5,44 @@ const KEY_PREFIX = 'axios-cache-';
 
 const MIN_TTL = 60000;
 
+let connectingPromise: Promise<void> | null = null;
+
 export default function createRedisStorage(redisEndpoint: string) {
   // eslint-disable-next-line import/no-extraneous-dependencies
-  const Redis = require('ioredis');
+  const redis = require('redis');
 
-  const client = new Redis(redisEndpoint);
+  const client = redis.createClient({ url: redisEndpoint });
+
+  const connectIfNeeded = async () => {
+    if (client.isReady) {
+      return;
+    }
+
+    if (connectingPromise) {
+      await connectingPromise;
+      return;
+    }
+
+    connectingPromise = client.connect();
+    try {
+      await connectingPromise;
+    } finally {
+      connectingPromise = null;
+    }
+  };
 
   // source https://axios-cache-interceptor.js.org/guide/storages#node-redis-storage
   return buildStorage({
     async find(key) {
+      await connectIfNeeded();
       const result = await client.get(`${KEY_PREFIX}${key}`);
       return result ? (JSON.parse(result) as StorageValue) : undefined;
     },
 
     // eslint-disable-next-line complexity
     async set(key, value, req) {
+      await connectIfNeeded();
+
       await client.set(`${KEY_PREFIX}${key}`, JSON.stringify(value), {
         PXAT:
           // We don't want to keep indefinitely values in the storage if
@@ -38,6 +61,7 @@ export default function createRedisStorage(redisEndpoint: string) {
     },
 
     async remove(key) {
+      await connectIfNeeded();
       await client.del(`${KEY_PREFIX}${key}`);
     },
   });
