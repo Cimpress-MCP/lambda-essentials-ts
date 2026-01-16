@@ -80,6 +80,6 @@
   },
   "peerDependencies": {
     "newrelic": "^12.0.0",
-    "redis": "^5.10.0"
+    "redis": "5.10.0"
   }
 }
