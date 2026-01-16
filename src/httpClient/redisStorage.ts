@@ -9,7 +9,7 @@ const KEY_PREFIX = 'axios-cache-';
 const MIN_TTL = 60000;
 
 export default function createRedisStorage(client: ReturnType<typeof createClient>) {
-  let connectionPromise: Promise<any> = client.connect();
+  const connectionPromise: Promise<any> = client.connect();
 
   const connectIfNeeded = async () => {
     if (client.isReady) {
