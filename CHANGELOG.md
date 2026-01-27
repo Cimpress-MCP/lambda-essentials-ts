@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
-## [7.0.5] - 2025-11-14
+## [7.0.6] - 2026-01-19
+
+### Changed
+
+- Switch back to redis, fix concurrent redis connection issues
+
+## [7.0.5] - 2026-01-14
 
 ### Changed
 
