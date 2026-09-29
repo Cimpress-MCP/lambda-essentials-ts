@@ -45,6 +45,8 @@ export default class HttpClient {
 
   private readonly clientExceptionStatusCodeMapOverride?: Record<number, number>;
 
+  private readonly whitelistedDomains?: string[];
+
   /**
    * Create a new Instance of the HttpClient
    */
@@ -60,6 +62,7 @@ export default class HttpClient {
     this.timeout = options?.timeout;
     this.clientExceptionStatusCodeMapOverride = options?.clientExceptionStatusCodeMapOverride;
     this.client = options?.client ?? axios.create();
+    this.whitelistedDomains = options?.whitelistedDomains;
 
     if (this.enableCache) {
       setupCache(this.client, {
@@ -213,6 +216,29 @@ export default class HttpClient {
   }
 
   /**
+   * Checks whether the given url's hostname exactly matches or is a subdomain of, one of the whitelistedDomains.
+   * If no whitelistedDomains were provided, all urls are considered whitelisted.
+   */
+  private isUrlWhitelisted(url: string, baseURL?: string): boolean {
+    if (!this.whitelistedDomains) {
+      return true;
+    }
+
+    let hostname: string;
+    try {
+      hostname = new URL(url, baseURL ?? this.client.defaults.baseURL).hostname;
+    } catch {
+      return false;
+    }
+
+    // anchored to the end of the hostname so e.g. "evilcimpress.io" can't spoof "cimpress.io"
+    return this.whitelistedDomains.some((domain) => {
+      const escapedDomain = domain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return new RegExp(`(^|\\.)${escapedDomain}$`, 'i').test(hostname);
+    });
+  }
+
+  /**
    * Resolves the token with the token provider and adds it to the headers
    */
   async createHeadersWithResolvedToken(
@@ -241,16 +267,37 @@ export default class HttpClient {
   }
 
   /**
+   * Removes the Authorization header when the url is not whitelisted (only applies if whitelistedDomains was configured)
+   */
+  private stripTokenIfNotWhitelisted(
+    url: string,
+    headers: { [key: string]: AxiosHeaderValue },
+    baseURL?: string,
+  ): { [key: string]: AxiosHeaderValue } {
+    if (this.isUrlWhitelisted(url, baseURL)) {
+      return headers;
+    }
+
+    const { Authorization, ...rest } = headers;
+    return rest;
+  }
+
+  /**
    * Get from the given url. Bearer token is automatically injected if tokenResolverFunction was provided to the constructor.
    */
   async get<T = any>(
     url: string,
     config: AxiosRequestConfig = { responseType: 'json' },
   ): Promise<AxiosResponse<T>> {
+    const headers = this.stripTokenIfNotWhitelisted(
+      url,
+      await this.createHeadersWithResolvedToken(config.headers),
+      config.baseURL,
+    );
     return this.client.get<T>(url, {
       responseType: 'json',
       ...config,
-      headers: await this.createHeadersWithResolvedToken(config.headers),
+      headers,
     });
   }
 
@@ -262,7 +309,11 @@ export default class HttpClient {
     data: any,
     config: AxiosRequestConfig = {},
   ): Promise<AxiosResponse<T>> {
-    const headers = await this.createHeadersWithResolvedToken(config.headers);
+    const headers = this.stripTokenIfNotWhitelisted(
+      url,
+      await this.createHeadersWithResolvedToken(config.headers),
+      config.baseURL,
+    );
     return this.client.post<T>(url, data, { ...config, headers });
   }
 
@@ -274,7 +325,11 @@ export default class HttpClient {
     data: any,
     config: AxiosRequestConfig = {},
   ): Promise<AxiosResponse<T>> {
-    const headers = await this.createHeadersWithResolvedToken(config.headers);
+    const headers = this.stripTokenIfNotWhitelisted(
+      url,
+      await this.createHeadersWithResolvedToken(config.headers),
+      config.baseURL,
+    );
     return this.client.put<T>(url, data, { ...config, headers });
   }
 
@@ -286,7 +341,11 @@ export default class HttpClient {
     data: any,
     config: AxiosRequestConfig = {},
   ): Promise<AxiosResponse<T>> {
-    const headers = await this.createHeadersWithResolvedToken(config.headers);
+    const headers = this.stripTokenIfNotWhitelisted(
+      url,
+      await this.createHeadersWithResolvedToken(config.headers),
+      config.baseURL,
+    );
     return this.client.patch<T>(url, data, { ...config, headers });
   }
 
@@ -294,7 +353,11 @@ export default class HttpClient {
    * Delete the resource on the given url. Bearer token is automatically injected if tokenResolverFunction was provided to the constructor.
    */
   async delete<T = any>(url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<T>> {
-    const headers = await this.createHeadersWithResolvedToken(config.headers);
+    const headers = this.stripTokenIfNotWhitelisted(
+      url,
+      await this.createHeadersWithResolvedToken(config.headers),
+      config.baseURL,
+    );
     return this.client.delete<T>(url, { ...config, headers });
   }
 
@@ -302,7 +365,11 @@ export default class HttpClient {
    * Makes a head call to the provided url. Bearer token is automatically injected if tokenResolverFunction was provided to the constructor.
    */
   async head<T = any>(url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<T>> {
-    const headers = await this.createHeadersWithResolvedToken(config.headers);
+    const headers = this.stripTokenIfNotWhitelisted(
+      url,
+      await this.createHeadersWithResolvedToken(config.headers),
+      config.baseURL,
+    );
     return this.client.head<T>(url, { ...config, headers });
   }
 
@@ -310,7 +377,11 @@ export default class HttpClient {
    * Makes an options call to the provided url. Bearer token is automatically injected if tokenResolverFunction was provided to the constructor.
    */
   async options<T = any>(url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<T>> {
-    const headers = await this.createHeadersWithResolvedToken(config.headers);
+    const headers = this.stripTokenIfNotWhitelisted(
+      url,
+      await this.createHeadersWithResolvedToken(config.headers),
+      config.baseURL,
+    );
     return this.client.options<T>(url, { ...config, headers });
   }
 }
@@ -364,6 +435,10 @@ export interface HttpClientOptions {
    * This is useful, when dependent services return incorrect status codes than then drive incorrect behavior upstream (e.g. 403 instead of 503)
    */
   clientExceptionStatusCodeMapOverride?: Record<number, number>;
+  /**
+   * If provided forwards JWT token only to whitelisted domains
+   */
+  whitelistedDomains?: string[];
 }
 
 /**
