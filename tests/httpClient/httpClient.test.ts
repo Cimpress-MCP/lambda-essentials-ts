@@ -64,6 +64,106 @@ describe('HttpClient', () => {
     });
   });
 
+  describe('whitelistedDomains', () => {
+    const testToken = 'unit-test-token';
+
+    const buildHttpClient = (whitelistedDomains?: string[]) => {
+      const axiosInstance = axios.create();
+      const mockAdapter = new MockAdapter(axiosInstance);
+      const httpClient = new HttpClient({
+        client: axiosInstance,
+        logFunction: jest.fn(),
+        tokenResolver: jest.fn().mockResolvedValue(testToken),
+        whitelistedDomains,
+      });
+      return { httpClient, mockAdapter };
+    };
+
+    test('passes the token to any domain when whitelistedDomains is not provided', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient();
+      mockAdapter.onGet('https://baddomain.com/resource').reply(200, {});
+      mockAdapter.onGet('https://evildomain.com/resource').reply(200, {});
+
+      await httpClient.get('https://baddomain.com/resource');
+      await httpClient.get('https://evildomain.com/resource');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toEqual(`Bearer ${testToken}`);
+      expect(mockAdapter.history.get[1].headers?.Authorization).toEqual(`Bearer ${testToken}`);
+    });
+
+    test('passes the token to each of the whitelisted domains', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient(['valid.io', 'test.com']);
+      mockAdapter.onGet('https://somethig.something.valid.io/resource').reply(200, {});
+      mockAdapter.onGet('http://whatever.test.com/resource').reply(200, {});
+
+      await httpClient.get('https://somethig.something.valid.io/resource');
+      await httpClient.get('http://whatever.test.com/resource');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toEqual(`Bearer ${testToken}`);
+      expect(mockAdapter.history.get[1].headers?.Authorization).toEqual(`Bearer ${testToken}`);
+    });
+
+    test('does not pass the token to a domain that is not whitelisted', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient(['valid.io', 'test.com']);
+      mockAdapter.onGet('https://baddomain.com/resource').reply(200, {});
+
+      await httpClient.get('https://baddomain.com/resource');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toBeUndefined();
+    });
+
+    test('does not pass the token to a domain that merely contains the whitelisted domain as a substring', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient(['valid.io']);
+      mockAdapter.onGet('https://somethingvalid.io/resource').reply(200, {});
+
+      await httpClient.get('https://somethingvalid.io/resource');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toBeUndefined();
+    });
+
+    test('does not pass the token to a domain that merely contains the whitelisted domain as a parameter', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient(['valid.io']);
+      mockAdapter.onGet('https://evil.io/params?somethig.valid.io').reply(200, {});
+      mockAdapter.onGet('https://evil.io/params/somethig.valid.io').reply(200, {});
+      mockAdapter.onGet('https://evil.io/params/whatever=somethig.valid.io').reply(200, {});
+
+      await httpClient.get('https://evil.io/params?somethig.valid.io');
+      await httpClient.get('https://evil.io/params/somethig.valid.io');
+      await httpClient.get('https://evil.io/params/whatever=somethig.valid.io');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toBeUndefined();
+      expect(mockAdapter.history.get[1].headers?.Authorization).toBeUndefined();
+      expect(mockAdapter.history.get[2].headers?.Authorization).toBeUndefined();
+    });
+
+    test('passes the token to a subdomain of a whitelisted domain', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient(['permited.io']);
+      mockAdapter.onGet('https://valid.permited.io/resource').reply(200, {});
+
+      await httpClient.get('https://valid.permited.io/resource');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toEqual(`Bearer ${testToken}`);
+    });
+
+    test('does not pass the token when trying to smuggle the whitelisted domain via the url path', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient(['valid.io']);
+      mockAdapter.onGet('https://baddomain.com/valid.io').reply(200, {});
+
+      await httpClient.get('https://baddomain.com/valid.io');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toBeUndefined();
+    });
+
+    test('should pass the token when different casing', async () => {
+      const { httpClient, mockAdapter } = buildHttpClient(['valid.io']);
+      mockAdapter.onGet('https://Valid.Io/resource').reply(200, {});
+
+      await httpClient.get('https://Valid.Io/resource');
+
+      expect(mockAdapter.history.get[0].headers?.Authorization).toEqual(`Bearer ${testToken}`);
+    });
+  });
+
   describe('generateCacheKey()', () => {
     it('key contains URL', () => {
       const request: AxiosRequestConfig = {
