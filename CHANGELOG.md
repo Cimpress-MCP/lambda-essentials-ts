@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
-## [7.1.0] - 2026-09-29
+## [7.1.0] - 2026-10-07
 
 ### Changed
 
-- Add an option to provide whitelisted domains in httpClient. Auth Bearer token won't be forwarder if the urls don't belong to the whitelisted domains.
+- Add an option to provide whitelisted domains in httpClient. Auth Bearer token won't be forwarded if the urls don't belong to the whitelisted domains.
 
 ## [7.0.6] - 2026-01-19
 

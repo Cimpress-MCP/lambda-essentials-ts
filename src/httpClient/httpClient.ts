@@ -231,7 +231,7 @@ export default class HttpClient {
       return false;
     }
 
-    // anchored to the end of the hostname so e.g. "evilcimpress.io" can't spoof "cimpress.io"
+    // anchored to the end of the hostname so e.g. "evilwhitelisteddomain.io" can't spoof "whitelisteddomain.io"
     return this.whitelistedDomains.some((domain) => {
       const escapedDomain = domain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       return new RegExp(`(^|\\.)${escapedDomain}$`, 'i').test(hostname);
