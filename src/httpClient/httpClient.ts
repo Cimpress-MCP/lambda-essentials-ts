@@ -269,7 +269,7 @@ export default class HttpClient {
   /**
    * Removes the Authorization header when the url is not whitelisted (only applies if whitelistedDomains was configured)
    */
-  private stripTokenIfNotWhitelisted(
+  private stripAuthHeaderIfNotWhitelisted(
     url: string,
     headers: { [key: string]: AxiosHeaderValue },
     baseURL?: string,
@@ -289,7 +289,7 @@ export default class HttpClient {
     url: string,
     config: AxiosRequestConfig = { responseType: 'json' },
   ): Promise<AxiosResponse<T>> {
-    const headers = this.stripTokenIfNotWhitelisted(
+    const headers = this.stripAuthHeaderIfNotWhitelisted(
       url,
       await this.createHeadersWithResolvedToken(config.headers),
       config.baseURL,
@@ -309,7 +309,7 @@ export default class HttpClient {
     data: any,
     config: AxiosRequestConfig = {},
   ): Promise<AxiosResponse<T>> {
-    const headers = this.stripTokenIfNotWhitelisted(
+    const headers = this.stripAuthHeaderIfNotWhitelisted(
       url,
       await this.createHeadersWithResolvedToken(config.headers),
       config.baseURL,
@@ -325,7 +325,7 @@ export default class HttpClient {
     data: any,
     config: AxiosRequestConfig = {},
   ): Promise<AxiosResponse<T>> {
-    const headers = this.stripTokenIfNotWhitelisted(
+    const headers = this.stripAuthHeaderIfNotWhitelisted(
       url,
       await this.createHeadersWithResolvedToken(config.headers),
       config.baseURL,
@@ -341,7 +341,7 @@ export default class HttpClient {
     data: any,
     config: AxiosRequestConfig = {},
   ): Promise<AxiosResponse<T>> {
-    const headers = this.stripTokenIfNotWhitelisted(
+    const headers = this.stripAuthHeaderIfNotWhitelisted(
       url,
       await this.createHeadersWithResolvedToken(config.headers),
       config.baseURL,
@@ -353,7 +353,7 @@ export default class HttpClient {
    * Delete the resource on the given url. Bearer token is automatically injected if tokenResolverFunction was provided to the constructor.
    */
   async delete<T = any>(url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<T>> {
-    const headers = this.stripTokenIfNotWhitelisted(
+    const headers = this.stripAuthHeaderIfNotWhitelisted(
       url,
       await this.createHeadersWithResolvedToken(config.headers),
       config.baseURL,
@@ -365,7 +365,7 @@ export default class HttpClient {
    * Makes a head call to the provided url. Bearer token is automatically injected if tokenResolverFunction was provided to the constructor.
    */
   async head<T = any>(url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<T>> {
-    const headers = this.stripTokenIfNotWhitelisted(
+    const headers = this.stripAuthHeaderIfNotWhitelisted(
       url,
       await this.createHeadersWithResolvedToken(config.headers),
       config.baseURL,
@@ -377,7 +377,7 @@ export default class HttpClient {
    * Makes an options call to the provided url. Bearer token is automatically injected if tokenResolverFunction was provided to the constructor.
    */
   async options<T = any>(url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<T>> {
-    const headers = this.stripTokenIfNotWhitelisted(
+    const headers = this.stripAuthHeaderIfNotWhitelisted(
       url,
       await this.createHeadersWithResolvedToken(config.headers),
       config.baseURL,
