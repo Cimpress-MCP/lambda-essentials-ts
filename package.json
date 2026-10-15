@@ -1,6 +1,6 @@
 {
   "name": "lambda-essentials-ts",
-  "version": "7.0.6",
+  "version": "7.1.0",
   "description": "A selection of the finest modules supporting authorization, API routing, error handling, logging and sending HTTP requests.",
   "main": "lib/index.js",
   "private": false,
@@ -29,7 +29,7 @@
     "@aws-sdk/client-kms": "^3.930.0",
     "@aws-sdk/client-secrets-manager": "^3.930.0",
     "@types/node": "^25.0.3",
-    "axios": "1.13.2",
+    "axios": "1.18.0",
     "axios-cache-interceptor": "1.11.2",
     "fast-safe-stringify": "~2.1.1",
     "is-error": "~2.2.2",
