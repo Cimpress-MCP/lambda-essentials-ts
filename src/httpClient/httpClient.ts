@@ -84,7 +84,7 @@ export default class HttpClient {
       this.client.defaults.raxConfig = {
         ...options?.retryOptions,
         instance: this.client, // always attach retry-axios to the private axios client
-        httpMethodsToRetry: ['GET', 'HEAD', 'OPTIONS', 'DELETE', 'PUT', 'POST', 'PATCH'], // extending the defaults to retry POST & PATCH calls
+        httpMethodsToRetry: ['GET', 'HEAD', 'OPTIONS', 'DELETE', 'PUT', 'POST'], // extending the defaults to retry POST calls
         onRetryAttempt: (err) => {
           this.logFunction({
             title: 'HTTP Response Error Retry',
