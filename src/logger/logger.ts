@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import * as uuid from 'uuid';
+import { randomUUID } from 'node:crypto';
 import stringify from 'fast-safe-stringify';
 import isError from 'is-error';
 import { redactSecret } from '../util';
@@ -20,14 +20,15 @@ export default class Logger {
 
   private staticData: any;
 
+  // eslint-disable-next-line complexity
   constructor(configuration?: LoggerConfiguration) {
     this.logFunction = configuration?.logFunction ?? console.log;
     this.jsonSpace = configuration?.jsonSpace ?? 2;
     this.payloadLimit = !configuration?.payloadLimit
       ? DEFAULT_PAYLOAD_LIMIT
       : configuration?.payloadLimit < MIN_PAYLOAD_LIMIT
-      ? MIN_PAYLOAD_LIMIT
-      : configuration.payloadLimit;
+        ? MIN_PAYLOAD_LIMIT
+        : configuration.payloadLimit;
 
     this.invocationId = 'none';
   }
@@ -39,7 +40,7 @@ export default class Logger {
    */
   startInvocation(staticData?: any, invocationId?: string): void {
     this.staticData = staticData;
-    this.invocationId = invocationId ?? uuid.v4();
+    this.invocationId = invocationId ?? randomUUID();
   }
 
   // eslint-disable-next-line complexity

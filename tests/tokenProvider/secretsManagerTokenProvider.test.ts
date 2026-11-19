@@ -12,18 +12,18 @@ describe('Secrets Manager Token Provider', () => {
   describe('getClientSecret', () => {
     test('throws when secret was not retrieved', async () => {
       const promisedSecret = { SecretString: undefined };
-      const SecretsManagerMock = jest.fn().mockImplementation(
-        (): Partial<SecretsManagerClient> => ({
+      const SecretsManagerMock = jest
+        .fn()
+        .mockImplementation((): Partial<SecretsManagerClient> => ({
           send: jest.fn().mockResolvedValueOnce(promisedSecret),
-        }),
-      );
+        }));
 
       const tokenProvider = new SecretsManagerTokenProvider({
         secretsManagerClient: new SecretsManagerMock(),
         tokenConfiguration,
       });
 
-      await expect(tokenProvider.getClientSecret()).rejects.toThrowError(
+      await expect(tokenProvider.getClientSecret()).rejects.toThrow(
         'Request error: failed to retrieve secret from Secrets Manager',
       );
     });
@@ -34,11 +34,11 @@ describe('Secrets Manager Token Provider', () => {
         Auth0ClientSecret: 'test-secret',
       };
       const promisedSecret = { SecretString: JSON.stringify(expectedSecret) };
-      const SecretsManagerMock = jest.fn().mockImplementation(
-        (): Partial<SecretsManagerClient> => ({
+      const SecretsManagerMock = jest
+        .fn()
+        .mockImplementation((): Partial<SecretsManagerClient> => ({
           send: jest.fn().mockResolvedValueOnce(promisedSecret),
-        }),
-      );
+        }));
 
       const secretsManager = new SecretsManagerMock();
       const tokenProvider = new SecretsManagerTokenProvider({

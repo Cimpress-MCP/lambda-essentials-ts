@@ -1,7 +1,11 @@
 import { AxiosError } from 'axios';
 import jwt from 'jsonwebtoken';
 
-export function safeJwtCanonicalIdParse(jwtToken: string): string | undefined {
+export function safeJwtCanonicalIdParse(jwtToken?: string): string | undefined {
+  if (!jwtToken) {
+    return undefined;
+  }
+
   try {
     return jwt.decode(jwtToken)?.['https://claims.cimpress.io/canonical_id'];
   } catch {

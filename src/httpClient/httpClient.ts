@@ -1,4 +1,4 @@
-import * as uuid from 'uuid';
+import { randomUUID } from 'node:crypto';
 import axios, {
   AxiosError,
   AxiosHeaderValue,
@@ -83,9 +83,8 @@ export default class HttpClient {
     if (this.enableRetry) {
       this.client.defaults.raxConfig = {
         ...options?.retryOptions,
-        instance: this.client, // always attach retry-axios to the private axios client
         httpMethodsToRetry: ['GET', 'HEAD', 'OPTIONS', 'DELETE', 'PUT', 'POST'], // extending the defaults to retry POST calls
-        onRetryAttempt: (err) => {
+        onRetryAttempt: async (err) => {
           this.logFunction({
             title: 'HTTP Response Error Retry',
             level: 'INFO',
@@ -154,6 +153,7 @@ export default class HttpClient {
 
         return response;
       },
+      // eslint-disable-next-line complexity
       (error: AxiosError | ClientException) => {
         // when retries are configured, this middleware gets triggered for each retry
         // it changes the error object to ClientException and therefore the transformation can be run only once
@@ -207,9 +207,10 @@ export default class HttpClient {
   }
 
   // implemented based on https://github.com/RasCarlito/axios-cache-adapter/blob/master/src/cache.js#L77
+  // eslint-disable-next-line complexity
   public static generateCacheKey(req: AxiosRequestConfig): string {
     const prefix: string = req.headers?.Authorization
-      ? safeJwtCanonicalIdParse(req.headers.Authorization.replace('Bearer ', '')) ?? uuid.v4()
+      ? (safeJwtCanonicalIdParse(req.headers.Authorization.replace('Bearer ', '')) ?? randomUUID())
       : 'shared';
     const url = `${req.baseURL ? req.baseURL : ''}${req.url}`;
     const query = req.params ? JSON.stringify(req.params) : ''; // possible improvement: optimize cache-hit ratio by sorting the query params

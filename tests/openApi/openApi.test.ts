@@ -1,7 +1,7 @@
-import { ApiRequest } from '../../src/openApi/apiRequestModel';
+import { ApiRequest } from '../../src';
 import OpenApiWrapper from '../../src/openApi/openApiWrapper';
 import { ClientException, ForbiddenException, InternalException } from '../../src';
-import { ApiResponse } from '../../src/openApi/apiResponseModel';
+import { ApiResponse } from '../../src';
 
 describe('Open API Wrapper', () => {
   const LoggerMock = jest.fn();
@@ -91,7 +91,7 @@ describe('Open API Wrapper', () => {
       const response = await openApi.api.requestMiddleware(request);
 
       expect(response).toEqual(request);
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'INFO',
         title: 'RequestLogger',
         method: httpMethod,
@@ -132,6 +132,22 @@ describe('Open API Wrapper', () => {
       expect(openApi.getUserToken()).toEqual(testJwt);
       expect(openApi.getUserPrincipal()).toEqual('john@doe.org');
     });
+
+    test('logs a warning and continues without tracking when New Relic cannot be loaded', async () => {
+      const logger = new LoggerMock();
+      const openApi = new OpenApiWrapper(logger, { enableNewRelicTracking: true });
+
+      const response = await openApi.api.requestMiddleware(request);
+
+      expect(response).toEqual(request);
+      expect(logger.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'NewRelicTracking',
+          level: 'WARN',
+          message: 'New Relic could not be loaded, continuing without New Relic tracking',
+        }),
+      );
+    });
   });
 
   describe('responseMiddleware', () => {
@@ -144,7 +160,7 @@ describe('Open API Wrapper', () => {
       const actual = await openApi.api.responseMiddleware(request, response);
 
       expect(actual).toEqual(response);
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'INFO',
         title: 'ResponseLogger',
         statusCode,
@@ -179,7 +195,7 @@ describe('Open API Wrapper', () => {
       const response = await openApi.api.errorMiddleware(request, error);
 
       expect(response).toEqual(expected);
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'CRITICAL',
         title: 'ErrorLogger',
         message,
@@ -208,7 +224,7 @@ describe('Open API Wrapper', () => {
       const actual = await openApi.api.errorMiddleware(request, exception);
 
       expect(actual).toEqual(expected);
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'ERROR',
         title: 'ErrorLogger',
         details: exception.details,
@@ -245,7 +261,7 @@ describe('Open API Wrapper', () => {
       const actual = await openApi.api.errorMiddleware(request, exception);
 
       expect(actual).toEqual(expected);
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'INFO',
         title: 'ErrorLogger',
         details: exception.details,
@@ -278,7 +294,7 @@ describe('Open API Wrapper', () => {
       const response = await openApi.api.errorMiddleware(request, exception);
 
       expect(response).toEqual(expected);
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'WARN',
         title: 'ErrorLogger',
         details: exception.details,
@@ -299,7 +315,7 @@ describe('Open API Wrapper', () => {
       const actual = await api.responseMiddleware(requestWithCorrelationHeader, response);
 
       expect(actual).toEqual(response.withCorrelationId(correlationId));
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'INFO',
         title: 'ResponseLogger',
         statusCode,
@@ -320,7 +336,7 @@ describe('Open API Wrapper', () => {
       const actual = await api.errorMiddleware(requestWithCorrelationHeader, internalException);
 
       expect(actual).toEqual(expectedResponse.withCorrelationId(correlationId));
-      expect(logger.log).toBeCalledWith({
+      expect(logger.log).toHaveBeenCalledWith({
         level: 'ERROR',
         title: 'ErrorLogger',
         statusCode,

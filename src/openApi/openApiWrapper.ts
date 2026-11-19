@@ -1,11 +1,19 @@
 import OpenApi from 'openapi-factory';
-import * as uuid from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { ApiRequest, AuthorizerContext } from './apiRequestModel';
 import { ApiResponse } from './apiResponseModel';
 import { Exception } from '../exceptions/exception';
 import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
-import { OpenApiModel } from './openApiModel';
+import { OpenApiModel, OpenApiOptions } from './openApiModel';
+
+// openapi-factory's typings are looser than its runtime: the handlers receive typed requests and the instance exposes the middlewares
+const OpenApiFactory = OpenApi as unknown as new (
+  options: OpenApiOptions,
+  overrideLogger?: () => void,
+) => OpenApiModel;
+
+type NewRelicApi = typeof import('newrelic');
 
 export interface OpenApiWrapperConfig {
   enableNewRelicTracking: boolean;
@@ -26,105 +34,99 @@ export default class OpenApiWrapper {
 
   private correlationId: string = this.notSet;
 
-  private newrelic;
+  private readonly newrelic?: NewRelicApi;
 
   constructor(requestLogger, config?: OpenApiWrapperConfig) {
     if (config?.enableNewRelicTracking) {
-      // eslint-disable-next-line global-require
-      this.newrelic = require('newrelic');
+      this.newrelic = OpenApiWrapper.loadNewRelic(requestLogger);
     }
 
-    // @ts-ignore Later Use the options Type from OpenApiFactory
-    this.api = new OpenApi(
-      {
-        requestMiddleware: async (request: ApiRequest): Promise<ApiRequest> => {
-          const correlationId = this.generateCorrelationId(request.headers);
-          requestLogger.startInvocation(null, correlationId);
+    const options: OpenApiOptions = {
+      requestMiddleware: async (request: ApiRequest): Promise<ApiRequest> => {
+        const correlationId = this.generateCorrelationId(request.headers);
+        requestLogger.startInvocation(null, correlationId);
 
-          const userData = this.determineUserData(
-            request.headers,
-            request.requestContext.authorizer,
-          );
-          this.userToken = userData.userToken ?? this.notSet;
-          this.userPrincipal = userData.userPrincipal ?? this.notSet;
+        const userData = this.determineUserData(request.headers, request.requestContext.authorizer);
+        this.userToken = userData.userToken ?? this.notSet;
+        this.userPrincipal = userData.userPrincipal ?? this.notSet;
 
-          this.requestId = request.requestContext.requestId;
-          requestLogger.log({
-            title: 'RequestLogger',
-            level: 'INFO',
-            body: request.body,
-            headers: {
-              Host: request.headers.Host,
-              'User-Agent': request.headers['User-Agent'],
-              'orion-correlation-id-parent': request.headers['orion-correlation-id-parent'],
-              'orion-correlation-id-root': request.headers['orion-correlation-id-root'],
-            },
-            method: request.httpMethod,
-            path: request.path,
-            user: this.userPrincipal,
-            query: request.multiValueQueryStringParameters,
+        this.requestId = request.requestContext.requestId;
+        requestLogger.log({
+          title: 'RequestLogger',
+          level: 'INFO',
+          body: request.body,
+          headers: {
+            Host: request.headers.Host,
+            'User-Agent': request.headers['User-Agent'],
+            'orion-correlation-id-parent': request.headers['orion-correlation-id-parent'],
+            'orion-correlation-id-root': request.headers['orion-correlation-id-root'],
+          },
+          method: request.httpMethod,
+          path: request.path,
+          user: this.userPrincipal,
+          query: request.multiValueQueryStringParameters,
+        });
+
+        if (config?.enableNewRelicTracking) {
+          this.newrelic?.addCustomAttributes({
+            canonicalId: this.userPrincipal,
+            correlationId,
           });
+        }
 
-          if (config?.enableNewRelicTracking) {
-            this.newrelic.addCustomAttributes({
-              canonicalId: this.userPrincipal,
-              correlationId,
-            });
+        return request;
+      },
+      responseMiddleware: async (
+        request: ApiRequest,
+        response: ApiResponse,
+      ): Promise<ApiResponse> => {
+        requestLogger.log({
+          title: 'ResponseLogger',
+          level: 'INFO',
+          statusCode: response.statusCode,
+        });
+
+        const { correlationId } = this;
+        this.clearContext();
+
+        return response.withCorrelationId(correlationId);
+      },
+
+      errorMiddleware: async (
+        request: ApiRequest,
+        error: Exception | Error,
+      ): Promise<ApiResponse> => {
+        const { correlationId } = this;
+        this.clearContext();
+        const serializedError = serializeObject(error, true);
+
+        if (error instanceof Exception) {
+          if (error.statusCode === 500) {
+            requestLogger.log({ title: 'ErrorLogger', level: 'ERROR', ...serializedError });
+          } else if (error.statusCode >= 400 && error.statusCode < 500) {
+            requestLogger.log({ title: 'ErrorLogger', level: 'WARN', ...serializedError });
+          } else {
+            requestLogger.log({ title: 'ErrorLogger', level: 'INFO', ...serializedError });
           }
 
-          return request;
-        },
-        responseMiddleware: async (
-          request: ApiRequest,
-          response: ApiResponse,
-        ): Promise<ApiResponse> => {
-          requestLogger.log({
-            title: 'ResponseLogger',
-            level: 'INFO',
-            statusCode: response.statusCode,
-          });
-
-          const { correlationId } = this;
-          this.clearContext();
-
-          return response.withCorrelationId(correlationId);
-        },
-
-        errorMiddleware: async (
-          request: ApiRequest,
-          error: Exception | Error,
-        ): Promise<ApiResponse> => {
-          const { correlationId } = this;
-          this.clearContext();
-          const serializedError = serializeObject(error, true);
-
-          if (error instanceof Exception) {
-            if (error.statusCode === 500) {
-              requestLogger.log({ title: 'ErrorLogger', level: 'ERROR', ...serializedError });
-            } else if (error.statusCode >= 400 && error.statusCode < 500) {
-              requestLogger.log({ title: 'ErrorLogger', level: 'WARN', ...serializedError });
-            } else {
-              requestLogger.log({ title: 'ErrorLogger', level: 'INFO', ...serializedError });
-            }
-
-            return new ApiResponse(error.statusCode, {
-              title: error.message,
-              details: error.details,
-              errorId: requestLogger.invocationId,
-            }).withCorrelationId(correlationId);
-          }
-
-          requestLogger.log({ title: 'ErrorLogger', level: 'CRITICAL', ...serializedError });
-
-          return new ApiResponse(500, {
-            title: 'Unexpected error',
-            details: serializedError,
+          return new ApiResponse(error.statusCode, {
+            title: error.message,
+            details: error.details,
             errorId: requestLogger.invocationId,
           }).withCorrelationId(correlationId);
-        },
+        }
+
+        requestLogger.log({ title: 'ErrorLogger', level: 'CRITICAL', ...serializedError });
+
+        return new ApiResponse(500, {
+          title: 'Unexpected error',
+          details: serializedError,
+          errorId: requestLogger.invocationId,
+        }).withCorrelationId(correlationId);
       },
-      () => {},
-    );
+    };
+
+    this.api = new OpenApiFactory(options, () => {});
 
     // This helps the destructuring of OpenApiWrapper's props to not lose context
     this.getUserToken = this.getUserToken.bind(this);
@@ -158,7 +160,7 @@ export default class OpenApiWrapper {
 
   private generateCorrelationId(headers: Record<string, string>) {
     const existingCorrelationId = headers[orionCorrelationIdRoot];
-    this.correlationId = existingCorrelationId ?? uuid.v4();
+    this.correlationId = existingCorrelationId ?? randomUUID();
     return this.correlationId;
   }
 
@@ -184,5 +186,20 @@ export default class OpenApiWrapper {
     }
 
     return { userToken: undefined, userPrincipal: undefined };
+  }
+
+  private static loadNewRelic(requestLogger): NewRelicApi | undefined {
+    try {
+      // eslint-disable-next-line global-require
+      return require('newrelic');
+    } catch (error) {
+      requestLogger.log({
+        title: 'NewRelicTracking',
+        level: 'WARN',
+        message: 'New Relic could not be loaded, continuing without New Relic tracking',
+        error: serializeObject(error, true),
+      });
+      return undefined;
+    }
   }
 }

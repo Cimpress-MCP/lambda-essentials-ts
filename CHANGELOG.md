@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [8.0.0-beta] - 2026-11-19
+
+### Changed
+
+- **BREAKING:** Minimum supported Node.js version is now 22. The library is tested on Node.js 22, 24 and 26.
+- **BREAKING:** Upgrade `retry-axios` to 4. `retryOptions` is typed by the new `RetryConfig`, so `onRetryAttempt` must return a Promise and the `instance` option no longer exists.
+- Upgrade `@aws-sdk/client-kms`, `@aws-sdk/client-secrets-manager`, `axios`, `axios-cache-interceptor`, `openapi-factory`, and the dev dependencies `@types/node` (26), `jest` (30), `@types/jest`, `ts-jest`, `lint-staged`, `eslint` (10), `prettier` (3) and `typescript` (6).
+- Move `@types/node` to the dev dependencies, so consumers keep their own `@types/node` version.
+- Replace the `uuid` dependency with Node's built-in `crypto.randomUUID()`.
+- Compile with `nodenext` module resolution and an ES2023 target without DOM types. The package is still published as CommonJS.
+- Replace the `@ts-ignore` around `openapi-factory` with typed middleware options. The `OpenApiModel` middlewares now return Promises.
+- When `enableNewRelicTracking` is set but `newrelic` cannot be loaded, `OpenApiWrapper` logs a warning and continues without New Relic tracking.
+- `createRedisStorage` now accepts any client matching the exported `RedisCacheClient` interface instead of importing types from `redis`, so consumers without `redis` installed no longer fail type-checking.
+- Allow `redis` 6 as a peer dependency (`^5.10.0 || ^6.0.0`) and mark it optional, since it is only needed when using `RedisStorage`.
+- Allow `newrelic` 13 and 14 as a peer dependency (`^12.0.0 || ^13.0.0 || ^14.0.0`) and mark it optional, since it is only loaded when `enableNewRelicTracking` is set.
+- Run the CI build on Node.js 22, 24 and 26, and install Yarn explicitly because Node.js 25+ no longer ships Corepack.
+
 ## [7.1.1] - 2026-11-19
 
 ### Changed
