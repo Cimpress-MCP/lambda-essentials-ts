@@ -20,6 +20,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Allow `redis` 6 as a peer dependency (`^5.10.0 || ^6.0.0`) and mark it optional, since it is only needed when using `RedisStorage`.
 - Allow `newrelic` 13 and 14 as a peer dependency (`^12.0.0 || ^13.0.0 || ^14.0.0`) and mark it optional, since it is only loaded when `enableNewRelicTracking` is set.
 - Run the CI build on Node.js 22, 24 and 26, and install Yarn explicitly because Node.js 25+ no longer ships Corepack.
+- Publish prereleases such as `8.0.0-beta` under their own npm dist-tag (`beta`) instead of `latest`.
+
+### Migrating from 7.x
+
+- Use Node.js 22 or newer.
+- If your service passes its own `SecretsManagerClient` or `KMSClient` to the library, upgrade your `@aws-sdk/client-secrets-manager` / `@aws-sdk/client-kms` to `^3.1172.0` or newer. Otherwise two copies of the SDK are installed and TypeScript reports the clients as incompatible.
+- Use TypeScript 4.9 or newer. The published type definitions were tested on 4.9, 5.0, 5.5 and 5.9.
+- If you pass `retryOptions`, update them for `retry-axios` 4: `onRetryAttempt` must return a Promise and the `instance` option no longer exists.
+- If you use `createRedisStorage`, any client with `isReady`, `connect`, `get`, `set` and `del` is accepted; a `redis` 5 or 6 client works as before.
+- `uuid` is no longer a dependency of this package. If your service imports `uuid` itself, keep it in your own `package.json`.
 
 ## [7.1.1] - 2026-11-19
 

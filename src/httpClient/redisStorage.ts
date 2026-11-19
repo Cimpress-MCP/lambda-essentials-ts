@@ -1,5 +1,5 @@
 import { buildStorage, canStale } from 'axios-cache-interceptor';
-import { StorageValue } from 'axios-cache-interceptor';
+import type { StorageValue } from 'axios-cache-interceptor';
 
 export interface RedisCacheClient {
   readonly isReady: boolean;

@@ -7,7 +7,8 @@ import { safeJwtCanonicalIdParse, serializeObject } from '../util';
 import { orionCorrelationIdRoot } from '../shared';
 import { OpenApiModel, OpenApiOptions } from './openApiModel';
 
-// openapi-factory's typings are looser than its runtime: the handlers receive typed requests and the instance exposes the middlewares
+// Deliberate double cast: openapi-factory's typings don't declare the middlewares the instance exposes at runtime
+// and type handlers as (req?: object), so neither an assignment nor a single cast compiles.
 const OpenApiFactory = OpenApi as unknown as new (
   options: OpenApiOptions,
   overrideLogger?: () => void,
@@ -67,12 +68,10 @@ export default class OpenApiWrapper {
           query: request.multiValueQueryStringParameters,
         });
 
-        if (config?.enableNewRelicTracking) {
-          this.newrelic?.addCustomAttributes({
-            canonicalId: this.userPrincipal,
-            correlationId,
-          });
-        }
+        this.newrelic?.addCustomAttributes({
+          canonicalId: this.userPrincipal,
+          correlationId,
+        });
 
         return request;
       },

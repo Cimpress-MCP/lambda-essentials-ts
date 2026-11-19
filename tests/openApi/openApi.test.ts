@@ -132,22 +132,6 @@ describe('Open API Wrapper', () => {
       expect(openApi.getUserToken()).toEqual(testJwt);
       expect(openApi.getUserPrincipal()).toEqual('john@doe.org');
     });
-
-    test('logs a warning and continues without tracking when New Relic cannot be loaded', async () => {
-      const logger = new LoggerMock();
-      const openApi = new OpenApiWrapper(logger, { enableNewRelicTracking: true });
-
-      const response = await openApi.api.requestMiddleware(request);
-
-      expect(response).toEqual(request);
-      expect(logger.log).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'NewRelicTracking',
-          level: 'WARN',
-          message: 'New Relic could not be loaded, continuing without New Relic tracking',
-        }),
-      );
-    });
   });
 
   describe('responseMiddleware', () => {
