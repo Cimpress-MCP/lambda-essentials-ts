@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [7.1.1] - 2026-11-19
+
+### Changed
+
+- Upgrade axios to 1.21.1 and axios-cache-interceptor to 1.13.0 (fixes axios and follow-redirects advisories).
+- Refresh AWS SDK clients and uuid to drop vulnerable transitive dependencies (fast-xml-parser, uuid).
+- Refresh transitive dev dependencies to fix Snyk findings.
+
 ## [7.1.0] - 2026-10-07
 
 ### Changed
