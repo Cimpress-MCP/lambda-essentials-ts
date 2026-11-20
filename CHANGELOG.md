@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
-## [8.0.0-beta] - 2026-11-19
+## [8.0.0-beta] - 2026-11-20
 
 ### Changed
 
@@ -31,7 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - If you use `createRedisStorage`, any client with `isReady`, `connect`, `get`, `set` and `del` is accepted; a `redis` 5 or 6 client works as before.
 - `uuid` is no longer a dependency of this package. If your service imports `uuid` itself, keep it in your own `package.json`.
 
-## [7.1.1] - 2026-11-19
+## [7.1.1] - 2026-11-20
 
 ### Changed
 
