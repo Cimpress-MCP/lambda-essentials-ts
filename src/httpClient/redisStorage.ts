@@ -1,14 +1,19 @@
 import { buildStorage, canStale } from 'axios-cache-interceptor';
 import type { StorageValue } from 'axios-cache-interceptor';
-// eslint-disable-next-line import/no-extraneous-dependencies
-// @ts-ignore
-import { createClient } from 'redis';
+
+export interface RedisCacheClient {
+  readonly isReady: boolean;
+  connect(): Promise<unknown>;
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string, options: { PXAT?: number }): Promise<unknown>;
+  del(key: string): Promise<unknown>;
+}
 
 const KEY_PREFIX = 'axios-cache-';
 
 const MIN_TTL = 60000;
 
-export default function createRedisStorage(client: ReturnType<typeof createClient>) {
+export default function createRedisStorage(client: RedisCacheClient) {
   const connectionPromise: Promise<any> = client.connect();
 
   const connectIfNeeded = async () => {
@@ -40,11 +45,11 @@ export default function createRedisStorage(client: ReturnType<typeof createClien
             ? Date.now() +
               (req?.cache && typeof req.cache.ttl === 'number' ? req.cache.ttl : MIN_TTL)
             : (value.state === 'stale' && value.ttl) ||
-              (value.state === 'cached' && !canStale(value))
-            ? value.createdAt + value.ttl!
-            : // otherwise, we can't determine when it should expire, so we keep
-              //   it indefinitely.
-              undefined,
+                (value.state === 'cached' && !canStale(value))
+              ? value.createdAt + value.ttl!
+              : // otherwise, we can't determine when it should expire, so we keep
+                //   it indefinitely.
+                undefined,
       });
     },
 
