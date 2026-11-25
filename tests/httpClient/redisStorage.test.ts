@@ -27,7 +27,7 @@ describe('redisStorage', () => {
   });
 
   it('should connect when not ready', async () => {
-    const storage = createRedisStorage(mClient as any);
+    const storage = createRedisStorage(mClient);
     mClient.isReady = false;
 
     await storage.get('key');
@@ -38,7 +38,7 @@ describe('redisStorage', () => {
 
   it('should connect only once when multiple requests are made', async () => {
     mClient.isReady = false;
-    const storage = createRedisStorage(mClient as any);
+    const storage = createRedisStorage(mClient);
 
     await Promise.all([storage.get('key1'), storage.get('key2')]);
 

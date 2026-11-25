@@ -33,7 +33,7 @@ describe('Token Provider', () => {
           Auth0ClientSecret: '',
         },
       );
-      await expect(tokenProvider.getTokenWithoutCache()).rejects.toThrowError(
+      await expect(tokenProvider.getTokenWithoutCache()).rejects.toThrow(
         'Request error: failed to retrieve Auth0 Client ID/Secret',
       );
     });
@@ -46,11 +46,9 @@ describe('Token Provider', () => {
       const tokenResponse = {
         access_token: 'test-access-token',
       };
-      const HttpClientMock = jest.fn().mockImplementation(
-        (): TokenProviderHttpClient => ({
-          post: jest.fn().mockResolvedValue({ data: tokenResponse }),
-        }),
-      );
+      const HttpClientMock = jest.fn().mockImplementation((): TokenProviderHttpClient => ({
+        post: jest.fn().mockResolvedValue({ data: tokenResponse }),
+      }));
       const httpClient = new HttpClientMock();
 
       const tokenProvider = new TestTokenProvider({ tokenConfiguration, httpClient }, auth0Secret);

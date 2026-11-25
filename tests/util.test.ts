@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosHeaders } from 'axios';
 import { serializeAxiosError, serializeObject } from '../src';
 import { safeJsonParse, safeJwtCanonicalIdParse, redactSecret } from '../src/util';
 
@@ -89,11 +89,11 @@ describe('Util', () => {
           details: 'test-details',
         },
         status: 409,
-        config: {},
-        headers: null,
+        config: { headers: new AxiosHeaders() },
+        headers: {},
         statusText: 'test-status-text',
       },
-      config: {},
+      config: { headers: new AxiosHeaders() },
       name: 'test-name',
       toJSON: () => ({}),
     };
@@ -134,15 +134,15 @@ describe('Util', () => {
             error,
           },
           status: 500,
-          config: {},
-          headers: null,
+          config: { headers: new AxiosHeaders() },
+          headers: {},
           statusText: 'test-status-text',
         },
-        config: {},
+        config: { headers: new AxiosHeaders() },
         name: 'test-name',
         toJSON: () => ({}),
       };
-      const serializedError = serializeAxiosError(axiosErrorWithNonExceptionError as any);
+      const serializedError = serializeAxiosError(axiosErrorWithNonExceptionError);
       expect(serializedError).toEqual(expected);
     });
   });

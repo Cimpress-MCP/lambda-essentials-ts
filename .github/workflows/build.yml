@@ -4,19 +4,29 @@ on: [pull_request]
 
 jobs:
   build:
-    name: Test
+    name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['22.x', '24.x', '26.x']
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.4
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: ${{ matrix.node-version }}
+
+      # Node.js 25+ no longer ships Corepack, so Yarn is not preinstalled
+      - name: Install Yarn
+        run: npm install --global yarn@1.22.22
 
       - name: Install dependencies
-        run: yarn
+        run: yarn --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
 
       - name: Unit Test
         run: yarn test

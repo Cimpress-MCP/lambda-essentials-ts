@@ -1,5 +1,4 @@
 import axios, { AxiosHeaders, AxiosRequestConfig } from 'axios';
-import * as uuid from 'uuid';
 import md5 from 'md5';
 import { InternalException } from '../../src';
 import HttpClient from '../../src/httpClient/httpClient';
@@ -197,12 +196,16 @@ describe('HttpClient', () => {
         await httpClient.get('https://valid.io', { headers });
 
         expect(
-          (mockAdapter.history.get[0].headers as AxiosHeaders).get('Authorization'),
+          (mockAdapter.history.get[0].headers as InstanceType<typeof AxiosHeaders>).get(
+            'Authorization',
+          ),
         ).toBeUndefined();
         expect(mockAdapter.history.get[0].headers?.['X-Custom']).toEqual('preserved');
-        expect((mockAdapter.history.get[1].headers as AxiosHeaders).get('Authorization')).toEqual(
-          `Bearer ${testToken}`,
-        );
+        expect(
+          (mockAdapter.history.get[1].headers as InstanceType<typeof AxiosHeaders>).get(
+            'Authorization',
+          ),
+        ).toEqual(`Bearer ${testToken}`);
         expect(headers[header]).toEqual(`Bearer ${testToken}`);
       },
     );
@@ -224,11 +227,15 @@ describe('HttpClient', () => {
         await httpClient.get('https://valid.io');
 
         expect(
-          (mockAdapter.history.get[0].headers as AxiosHeaders).get('Authorization'),
+          (mockAdapter.history.get[0].headers as InstanceType<typeof AxiosHeaders>).get(
+            'Authorization',
+          ),
         ).toBeUndefined();
-        expect((mockAdapter.history.get[1].headers as AxiosHeaders).get('Authorization')).toEqual(
-          `Bearer ${testToken}`,
-        );
+        expect(
+          (mockAdapter.history.get[1].headers as InstanceType<typeof AxiosHeaders>).get(
+            'Authorization',
+          ),
+        ).toEqual(`Bearer ${testToken}`);
         expect(axiosInstance.defaults.headers[scope].authorization).toEqual(`Bearer ${testToken}`);
       },
     );
@@ -367,7 +374,9 @@ describe('HttpClient', () => {
         url: 'testUrl',
       };
       const result = HttpClient.generateCacheKey(request);
-      expect(uuid.validate(result.split('/')[0])).toBeTruthy();
+      expect(result.split('/')[0]).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+      );
       expect(result.split('/')[1]).toEqual('testUrl');
     });
   });
