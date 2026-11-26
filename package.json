@@ -1,6 +1,6 @@
 {
   "name": "lambda-essentials-ts",
-  "version": "7.1.1",
+  "version": "8.0.0-beta",
   "description": "A selection of the finest modules supporting authorization, API routing, error handling, logging and sending HTTP requests.",
   "main": "lib/index.js",
   "private": false,
@@ -8,9 +8,9 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "test": "jest",
-    "lint": "eslint --ext .ts src tests"
+    "lint": "eslint src tests"
   },
   "publishConfig": {
     "access": "public"
@@ -26,35 +26,31 @@
   },
   "homepage": "https://github.com/Cimpress-MCP/lambda-essentials-ts#readme",
   "dependencies": {
-    "@aws-sdk/client-kms": "^3.930.0",
-    "@aws-sdk/client-secrets-manager": "^3.930.0",
-    "@types/node": "^25.0.3",
+    "@aws-sdk/client-kms": "^3.1172.0",
+    "@aws-sdk/client-secrets-manager": "^3.1172.0",
     "axios": "1.21.1",
     "axios-cache-interceptor": "1.13.0",
     "fast-safe-stringify": "~2.1.1",
     "is-error": "~2.2.2",
     "jsonwebtoken": "9.0.3",
     "md5": "~2.3.0",
-    "openapi-factory": "5.4.60",
-    "retry-axios": "~3.2.1",
-    "uuid": "~11.1.0"
+    "openapi-factory": "5.4.93",
+    "retry-axios": "~4.0.3"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/newrelic": "^9.14.8",
+    "@types/node": "^26.6.6",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^8.57.1",
-    "eslint-config-cimpress-atsquad": "^2.2.3",
+    "eslint": "^10.15.0",
+    "eslint-config-cimpress-atsquad": "^3.0.0",
     "husky": "^9.1.7",
-    "jest": "^29.7.0",
-    "lint-staged": "^15.5.2",
-    "prettier": "^2.8.8",
-    "ts-jest": "^29.4.6",
+    "jest": "^30.5.2",
+    "lint-staged": "^17.6.1",
+    "prettier": "^3.10.1",
+    "ts-jest": "^29.4.15",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  },
-  "eslintConfig": {
-    "extends": "cimpress-atsquad"
+    "typescript": "^6.0.3"
   },
   "prettier": "eslint-config-cimpress-atsquad/prettier",
   "husky": {
@@ -76,10 +72,18 @@
     "collectCoverage": false
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "peerDependencies": {
-    "newrelic": "^12.0.0",
-    "redis": "5.10.0"
+    "newrelic": "^12.0.0 || ^13.0.0 || ^14.0.0",
+    "redis": "^5.10.0 || ^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "newrelic": {
+      "optional": true
+    },
+    "redis": {
+      "optional": true
+    }
   }
 }

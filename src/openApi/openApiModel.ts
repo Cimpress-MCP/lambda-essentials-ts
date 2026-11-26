@@ -27,15 +27,6 @@ export interface OpenApiModel {
   requestMiddleware: RequestMiddleware;
   responseMiddleware: ResponseMiddleware;
   errorMiddleware: ErrorMiddleware;
-
-  constructor(
-    options: {
-      requestMiddleware: RequestMiddleware;
-      responseMiddleware: ResponseMiddleware;
-      errorMiddleware: ErrorMiddleware;
-    },
-    overrideLogger?: () => void,
-  );
 }
 
 export type ApiControllerRoute<T = ApiRequest> = (
@@ -43,6 +34,18 @@ export type ApiControllerRoute<T = ApiRequest> = (
   handler: (request: T) => Promise<ApiResponse>,
 ) => void;
 
-export type RequestMiddleware = (request: ApiRequest) => ApiRequest;
-export type ResponseMiddleware = (request: ApiRequest, response: ApiResponse) => ApiResponse;
-export type ErrorMiddleware = (request: ApiRequest, error: Exception | Error) => ApiResponse;
+export type RequestMiddleware = (request: ApiRequest) => Promise<ApiRequest>;
+export type ResponseMiddleware = (
+  request: ApiRequest,
+  response: ApiResponse,
+) => Promise<ApiResponse>;
+export type ErrorMiddleware = (
+  request: ApiRequest,
+  error: Exception | Error,
+) => Promise<ApiResponse>;
+
+export interface OpenApiOptions {
+  requestMiddleware: RequestMiddleware;
+  responseMiddleware: ResponseMiddleware;
+  errorMiddleware: ErrorMiddleware;
+}

@@ -1,19 +1,15 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "es2023",
+    "lib": ["es2023"],
+    "types": ["node", "jest"],
     "strict": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "target": "es2021",
-    "outDir": "lib",
-    "declaration": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
     "noImplicitAny": false,
-    "preserveConstEnums": true,
+    "isolatedModules": true,
     "newLine": "lf",
-    "types": ["node", "jest"]
+    "noEmit": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

@@ -13,18 +13,16 @@ describe('KMS Token Provider', () => {
   describe('getClientSecret', () => {
     test('throws when secret was not decrypted', async () => {
       const promisedDecryptedText = { data: { Plaintext: undefined } };
-      const KMSMock = jest.fn().mockImplementation(
-        (): Partial<KMSClient> => ({
-          send: jest.fn().mockResolvedValue(promisedDecryptedText),
-        }),
-      );
+      const KMSMock = jest.fn().mockImplementation((): Partial<KMSClient> => ({
+        send: jest.fn().mockResolvedValue(promisedDecryptedText),
+      }));
 
       const tokenProvider = new KmsTokenProvider({
         kmsClient: new KMSMock(),
         tokenConfiguration,
       });
 
-      await expect(tokenProvider.getClientSecret()).rejects.toThrowError(
+      await expect(tokenProvider.getClientSecret()).rejects.toThrow(
         'Request error: failed to decrypt secret using KMS',
       );
     });
@@ -37,11 +35,9 @@ describe('KMS Token Provider', () => {
       const promisedDecryptedText = {
         Plaintext: expectedSecret.Auth0ClientSecret,
       };
-      const KMSMock = jest.fn().mockImplementation(
-        (): Partial<KMSClient> => ({
-          send: jest.fn().mockResolvedValue(promisedDecryptedText),
-        }),
-      );
+      const KMSMock = jest.fn().mockImplementation((): Partial<KMSClient> => ({
+        send: jest.fn().mockResolvedValue(promisedDecryptedText),
+      }));
 
       const kms = new KMSMock();
       const tokenProvider = new KmsTokenProvider({
