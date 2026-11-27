@@ -42,8 +42,20 @@ jobs:
         run: |
           echo "tag=$(node -p "require('./package.json').version.match(/-([0-9A-Za-z]+)/)?.[1] ?? 'latest'")" >> "$GITHUB_OUTPUT"
 
+      - name: Check if version is already published
+        id: published
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          if [ -n "$(npm view "$name@$version" version 2>/dev/null)" ]; then
+            echo "Version $version is already published, skipping"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish if version has been updated
         run: npm publish --access public --tag ${{ steps.dist-tag.outputs.tag }}
-        if: contains(github.event.head_commit.message, 'Release ')
+        if: steps.published.outputs.exists == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
